@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct CepSepetiAppApp: App {
@@ -13,5 +14,6 @@ struct CepSepetiAppApp: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for :[ShoppingSession.self, ShoppingItem.self])
     }
 }
