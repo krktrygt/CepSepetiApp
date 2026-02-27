@@ -1,0 +1,85 @@
+//
+//  BarcodeScannerView.swift
+//  CepSepetiApp
+//
+//  Created by Korkut Eryiğit on 28.02.2026.
+//
+
+import SwiftUI
+
+struct BarcodeScannerView: View {
+    
+    // 1. Backend servisimizi UI'a bağlıyoruz
+    @State private var scannerService = BarcodeScannerService()
+        
+    // 2. Okunan barkodu ekranda göstermek için State (MVP Testi için)
+    @State private var scannedCode: String?
+        
+    // Ekranı kapatmak için çevresel değişken (Environment)
+    @Environment(\.dismiss) var dismiss
+    
+    var body: some View {
+        NavigationStack{
+            ZStack{
+                // Katman 1: Kamera görüntüsü
+                CameraPreviewView(session: scannerService.captureSession)
+                    .ignoresSafeArea()
+                
+                //Katman 2: Arayüz elemanları
+                VStack{
+                    Spacer()
+                    
+                    // Kullanıcıya nereye odaklanacağını gösteren vizör (Tasarım detayı)
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.green.opacity(0.8), lineWidth: 3)
+                        .frame(width: 250, height: 150)
+                        .background(Color.black.opacity(0.1))
+                                        
+                    Spacer()
+                    
+                    if let code = scannedCode {
+                        Text("Bulunan Barkod: \(code)")
+                            .font(.headline)
+                            .foregroundColor(.black)
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(10)
+                            .padding(.bottom, 40)
+                    }
+                }
+            }
+            .navigationTitle("Barkod Okut")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(action: { dismiss() }) {
+                        Image (systemName: "xmark")
+                            .font(.system(size: 18, weight: .bold))
+                            .foregroundColor(.white)
+                            .padding(8)
+                            .background(Color.black.opacity(0.5))
+                            .clipShape(Circle())
+                    }
+                }
+            }
+        }
+        .onAppear{
+            // Ekran açıldığında kamerayı başlat
+            scannerService.startScanning()
+                        
+            // Backend barkodu bulduğunda ne yapacağımızı söylüyoruz (Callback)
+            scannerService.onBarcodeScanned = { barcode in
+                    self.scannedCode = barcode
+                    // TODO: Aşama 3'te burada Open Food Facts API'sine istek atacağız.
+                }
+            }
+            .onDisappear {
+                // Ekran kapandığında kamerayı durdur (Batarya sömürüsünü engellemek için kritik)
+            scannerService.stopScanning()
+        }
+    }
+}
+
+#Preview {
+    BarcodeScannerView()
+}
