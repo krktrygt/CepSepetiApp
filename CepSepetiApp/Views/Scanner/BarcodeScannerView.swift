@@ -14,6 +14,8 @@ struct BarcodeScannerView: View {
         
     // 2. Okunan barkodu ekranda göstermek için State (MVP Testi için)
     @State private var scannedCode: String?
+    @State private var productName: String?
+    @State private var isSearching: Bool = false // API isteği atıldığında UI'ı kilitlemek için
         
     // Ekranı kapatmak için çevresel değişken (Environment)
     @Environment(\.dismiss) var dismiss
@@ -37,14 +39,36 @@ struct BarcodeScannerView: View {
                                         
                     Spacer()
                     
-                    if let code = scannedCode {
-                        Text("Bulunan Barkod: \(code)")
-                            .font(.headline)
-                            .foregroundColor(.black)
-                            .padding()
-                            .background(Color.white)
-                            .cornerRadius(10)
-                            .padding(.bottom, 40)
+                    if isSearching{
+                        VStack{
+                            ProgressView()
+                                .tint(.black)
+                            Text("Ürün aranıyor...")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                                .padding(.top, 4)
+                        }
+                        .padding()
+                        .background(.white)
+                        .cornerRadius(10)
+                        .padding(.bottom, 40)
+                    } else if let code = scannedCode {
+                        VStack (spacing: 8){
+                            
+                            Text("Barkod: \(code)")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                                
+                            // API'den gelen isim veya hata mesajı
+                            Text(productName ?? "Beklenmeyen Hata")
+                                .font(.headline)
+                                .foregroundColor(.black)
+                                .multilineTextAlignment(.center)
+                        }
+                        .padding()
+                        .background(.white)
+                        .cornerRadius(10)
+                        .padding(.bottom, 40)
                     }
                 }
             }
@@ -69,10 +93,29 @@ struct BarcodeScannerView: View {
                         
             // Backend barkodu bulduğunda ne yapacağımızı söylüyoruz (Callback)
             scannerService.onBarcodeScanned = { barcode in
-                    self.scannedCode = barcode
-                    // TODO: Aşama 3'te burada Open Food Facts API'sine istek atacağız.
+                
+                guard !self.isSearching else { return }
+                self.scannedCode = barcode
+                self.isSearching = true
+                self.productName = nil
+                
+                Task{
+                    do {
+                        
+                        if let product = try await OpenFoodFactsService.shared.fetchProduct(barcode: barcode) {
+                            self.productName = product.productName ?? "İsimsiz Ürün"
+                        } else {
+                            self.productName = "Ürün bulunamadı (Manuel girilecek)"
+                        }
+                    } catch {
+                        self.productName = "Bağlantı hatası!"
+                        print("API Hatası: \(error)")
+                    }
+                    
+                    self.isSearching = false
                 }
             }
+        }
             .onDisappear {
                 // Ekran kapandığında kamerayı durdur (Batarya sömürüsünü engellemek için kritik)
             scannerService.stopScanning()
