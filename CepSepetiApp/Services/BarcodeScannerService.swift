@@ -23,6 +23,30 @@ final class BarcodeScannerService: NSObject, AVCaptureMetadataOutputObjectsDeleg
         setupCamera()
     }
     
+    private func configureCameraFocus(device: AVCaptureDevice){
+        do{
+            // Donanım ayarlarını değiştirmek için cihazı kilitle
+            try device.lockForConfiguration()
+            
+            // Odak noktasını ekranın tam ortasına (X: 0.5, Y: 0.5) sabitle
+            if device.isFocusPointOfInterestSupported{
+                device.focusPointOfInterest = CGPoint(x: 0.5, y: 0.5)
+            }
+            // Sürekli otomatik odaklama destekleniyorsa aktif et
+            if device.isFocusModeSupported(.continuousAutoFocus){
+                device.focusMode = .continuousAutoFocus
+            }
+            let recommendedZoom: CGFloat = 2.0
+            device.videoZoomFactor = min(recommendedZoom, device.activeFormat.videoMaxZoomFactor)
+            
+            // 4. Ayarlar bittikten sonra kilidi aç
+            device.unlockForConfiguration()
+        } catch {
+            print("Hata: Kamera odak ayarı yapılamadı. \(error.localizedDescription)")
+        }
+        
+    }
+    
     private func setupCamera() {
         sessionQueue.async { [weak self] in
             guard let self = self else { return }
@@ -36,6 +60,8 @@ final class BarcodeScannerService: NSObject, AVCaptureMetadataOutputObjectsDeleg
                 self.captureSession.commitConfiguration()
                 return
             }
+            
+            self.configureCameraFocus(device: videoCaptureDevice)
             
             if self.captureSession.canAddInput(videoInput) {
                 self.captureSession.addInput(videoInput)
