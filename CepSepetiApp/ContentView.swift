@@ -4,7 +4,7 @@
 //
 //  Created by Korkut Eryiğit on 27.02.2026.
 //
-
+/*
 import SwiftUI
 
 struct ContentView: View {
@@ -27,3 +27,4 @@ struct ContentView: View {
 #Preview {
     ContentView()
 }
+*/

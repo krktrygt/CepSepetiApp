@@ -12,16 +12,16 @@ final class ShoppingSession {
     var id: UUID
     var date: Date
     var totalAmount: Decimal
-    var isComplated: Bool
+    var isCompleted: Bool
     
     @Relationship(deleteRule: .cascade, inverse: \ShoppingItem.session)
     var items: [ShoppingItem]?
     
-    init(id: UUID, date: Date, totalAmount: Decimal, isComplated: Bool, items: [ShoppingItem]? = nil) {
+    init(id: UUID, date: Date, totalAmount: Decimal, isCompleted: Bool, items: [ShoppingItem]? = nil) {
         self.id = id
         self.date = date
         self.totalAmount = totalAmount
-        self.isComplated = isComplated
+        self.isCompleted = isCompleted
         self.items = items
     }
 }

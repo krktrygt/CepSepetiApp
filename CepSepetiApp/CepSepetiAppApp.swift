@@ -12,7 +12,7 @@ import SwiftData
 struct CepSepetiAppApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            HomeView()
         }
         .modelContainer(for :[ShoppingSession.self, ShoppingItem.self])
     }
