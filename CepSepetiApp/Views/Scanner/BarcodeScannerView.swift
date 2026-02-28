@@ -16,6 +16,15 @@ struct BarcodeScannerView: View {
     @State private var scannedCode: String?
     @State private var productName: String?
     @State private var isSearching: Bool = false // API isteği atıldığında UI'ı kilitlemek için
+    
+    // Ürünün ekleneceği aktif sepet (Ana sayfadan buraya gönderilecek)
+    var activeSession: ShoppingSession
+        
+    // Form ekranını (Sheet) alttan kaydırarak açmak için tetikleyici
+    @State private var showAddProductSheet: Bool = false
+        
+    // Kamerayı durdurduğumuzda form kapansa bile kameranın tekrar başlaması için
+    @State private var isScannerPaused: Bool = false
         
     // Ekranı kapatmak için çevresel değişken (Environment)
     @Environment(\.dismiss) var dismiss
@@ -113,16 +122,37 @@ struct BarcodeScannerView: View {
                     }
                     
                     self.isSearching = false
+                    // YENİ: Kamerayı duraklat ve Form ekranını alttan aç
+                    self.isScannerPaused = true
+                    self.showAddProductSheet = true
                 }
             }
         }
-            .onDisappear {
-                // Ekran kapandığında kamerayı durdur (Batarya sömürüsünü engellemek için kritik)
-            scannerService.stopScanning()
+        .onDisappear {
+            // Ekran kapandığında kamerayı durdur (Batarya sömürüsünü engellemek için kritik)
+        scannerService.stopScanning()
+        }
+        .sheet(isPresented: $showAddProductSheet, onDismiss: {
+            // Kullanıcı formu kapattığında (Kaydet veya İptal dediğinde)
+            // bir sonraki ürünü okutabilmesi için kamerayı ve state'leri sıfırla
+            self.scannedCode = nil
+            self.productName = nil
+            self.isScannerPaused = false
+            self.scannerService.startScanning()
+        }) {
+            // Açılacak olan ekran ve içine gönderilecek veriler
+            if let barcode = scannedCode {
+                AddProductView(
+                    scannedBarcode: barcode,
+                    apiName: productName, // Bulunamadıysa null veya hata mesajı gidecek
+                    session: activeSession
+                )
+            }
         }
     }
 }
-
+/*
 #Preview {
     BarcodeScannerView()
 }
+*/
