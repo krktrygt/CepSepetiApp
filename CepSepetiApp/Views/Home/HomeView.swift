@@ -73,53 +73,54 @@ struct HomeView: View {
                     }
                 }
                 .listStyle(.insetGrouped)
-                // GEÇİCİ OCR TEST BUTONU - İŞİMİZ BİTİNCE SİLİNECEK
+                // GEÇİCİ OCR + GEMINI TEST BUTONU
                 Button(action: {
-                    // OCRService async/await yapısında olduğu için Task içine alıyoruz
                     Task {
-                        // 1. Görseli Assets'ten çek
                         guard let testImage = UIImage(named: "test_label") else {
-                            print("HATA: 'test_label' adında bir görsel Assets klasöründe bulunamadı!")
+                            print("HATA: Görsel bulunamadı!")
                             return
                         }
                         
                         let ocrService = OCRService()
+                        let geminiService = GeminiService() // Gemini servisini başlattık
                         
                         do {
-                            print("⏳ OCR İşlemi Başladı, arka planda analiz ediliyor...")
-                            
-                            // 2. Servisi çağır ve bekle
+                            print("⏳ 1. Aşama: OCR İşlemi Başladı...")
                             let resultText = try await ocrService.recognizeText(from: testImage)
+                            print("✅ OCR Tamamlandı. Gemini'ye gönderiliyor...")
                             
-                            // 3. Sonucu Xcode konsoluna yazdır
-                            print("✅ OCR BAŞARILI. İŞTE VİSİON'IN GÖRDÜKLERİ:")
+                            // Vision'dan gelen metni doğrudan Gemini'ye veriyoruz
+                            print("⏳ 2. Aşama: Yapay Zeka Analizi Başladı...")
+                            let parsedData = try await geminiService.parse(ocrText: resultText)
+                            
+                            print("🚀 HİBRİT SİSTEM BAŞARILI! SONUÇ:")
                             print("--------------------------------------------------")
-                            print(resultText)
+                            print("Ürün Adı : \(parsedData.productName)")
+                            print("Fiyat    : \(parsedData.price) ₺")
+                            print("Marka    : \(parsedData.brand ?? "Bulunamadı")")
                             print("--------------------------------------------------")
                             
                         } catch let error as OCRError {
-                            // Bizim yazdığımız özel hata mesajları
-                            print("❌ OCR BAŞARISIZ: \(error.localizedDescription)")
+                            print("❌ SİSTEM HATASI: \(error.localizedDescription)")
                         } catch {
-                            // Bilinmeyen sistem hataları
                             print("❌ BEKLENMEYEN HATA: \(error.localizedDescription)")
                         }
                     }
                 }) {
                     HStack {
-                        Image(systemName: "text.viewfinder")
-                        Text("OCR Servisini Test Et")
+                        Image(systemName: "sparkles")
+                        Text("Uçtan Uca Sistemi Test Et")
                     }
                     .font(.headline)
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.orange) // Farklı dursun diye turuncu yaptık
+                    .background(Color.purple)
                     .cornerRadius(12)
                 }
                 .padding(.horizontal)
                 .padding(.bottom, 8)
-                // GEÇİCİ OCR TEST BUTONU BİTİŞİ
+                // GEÇİCİ OCR + GEMİNİ TEST BUTONU
 
                 // 3. En Alt: Yeni Alışveriş Başlat Butonu
                 Button(action: {
