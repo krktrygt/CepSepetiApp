@@ -1,0 +1,10 @@
+# Xcode
+#
+build/
+DerivedData/
+*.hmap
+*.ipa
+*.xcuserstate
+project.xcworkspace/xcuserdata/
+*.xcuserdatad
+Secrets.plist
