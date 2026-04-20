@@ -75,37 +75,28 @@ struct HomeView: View {
                 .listStyle(.insetGrouped)
                 // GEÇİCİ OCR + GEMINI TEST BUTONU
                 Button(action: {
+                    // GEÇİCİ KAMERA TEST BUTONU
                     Task {
-                        guard let testImage = UIImage(named: "test_label") else {
-                            print("HATA: Görsel bulunamadı!")
-                            return
-                        }
+                        let camera = CameraService()
+                        camera.start()
+                        print("📸 Kamera başlatıldı, odaklanılıyor...")
                         
-                        let ocrService = OCRService()
-                        let geminiService = GeminiService() // Gemini servisini başlattık
+                        // Kameranın açılması için 1-2 saniye sistemin toparlanmasını bekle
+                        try? await Task.sleep(nanoseconds: 2_000_000_000)
                         
                         do {
-                            print("⏳ 1. Aşama: OCR İşlemi Başladı...")
-                            let resultText = try await ocrService.recognizeText(from: testImage)
-                            print("✅ OCR Tamamlandı. Gemini'ye gönderiliyor...")
-                            
-                            // Vision'dan gelen metni doğrudan Gemini'ye veriyoruz
-                            print("⏳ 2. Aşama: Yapay Zeka Analizi Başladı...")
-                            let parsedData = try await geminiService.parse(ocrText: resultText)
-                            
-                            print("🚀 HİBRİT SİSTEM BAŞARILI! SONUÇ:")
-                            print("--------------------------------------------------")
-                            print("Ürün Adı : \(parsedData.productName)")
-                            print("Fiyat    : \(parsedData.price) ₺")
-                            print("Marka    : \(parsedData.brand ?? "Bulunamadı")")
-                            print("--------------------------------------------------")
-                            
-                        } catch let error as OCRError {
-                            print("❌ SİSTEM HATASI: \(error.localizedDescription)")
+                            print("📸 Deklanşöre basılıyor...")
+                            let capturedImage = try await camera.capturePhoto()
+                            print("✅ BAŞARILI! Fotoğraf çekildi.")
+                            print("📊 Görüntü Boyutu: \(capturedImage.size.width) x \(capturedImage.size.height)")
                         } catch {
-                            print("❌ BEKLENMEYEN HATA: \(error.localizedDescription)")
+                            print("❌ HATA: Kamera fotoğraf çekemedi. Detay: \(error)")
                         }
+                        
+                        camera.stop()
                     }
+
+
                 }) {
                     HStack {
                         Image(systemName: "sparkles")
