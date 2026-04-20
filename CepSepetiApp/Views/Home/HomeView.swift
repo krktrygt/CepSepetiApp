@@ -73,7 +73,54 @@ struct HomeView: View {
                     }
                 }
                 .listStyle(.insetGrouped)
-                
+                // GEÇİCİ OCR TEST BUTONU - İŞİMİZ BİTİNCE SİLİNECEK
+                Button(action: {
+                    // OCRService async/await yapısında olduğu için Task içine alıyoruz
+                    Task {
+                        // 1. Görseli Assets'ten çek
+                        guard let testImage = UIImage(named: "test_label") else {
+                            print("HATA: 'test_label' adında bir görsel Assets klasöründe bulunamadı!")
+                            return
+                        }
+                        
+                        let ocrService = OCRService()
+                        
+                        do {
+                            print("⏳ OCR İşlemi Başladı, arka planda analiz ediliyor...")
+                            
+                            // 2. Servisi çağır ve bekle
+                            let resultText = try await ocrService.recognizeText(from: testImage)
+                            
+                            // 3. Sonucu Xcode konsoluna yazdır
+                            print("✅ OCR BAŞARILI. İŞTE VİSİON'IN GÖRDÜKLERİ:")
+                            print("--------------------------------------------------")
+                            print(resultText)
+                            print("--------------------------------------------------")
+                            
+                        } catch let error as OCRError {
+                            // Bizim yazdığımız özel hata mesajları
+                            print("❌ OCR BAŞARISIZ: \(error.localizedDescription)")
+                        } catch {
+                            // Bilinmeyen sistem hataları
+                            print("❌ BEKLENMEYEN HATA: \(error.localizedDescription)")
+                        }
+                    }
+                }) {
+                    HStack {
+                        Image(systemName: "text.viewfinder")
+                        Text("OCR Servisini Test Et")
+                    }
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.orange) // Farklı dursun diye turuncu yaptık
+                    .cornerRadius(12)
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 8)
+                // GEÇİCİ OCR TEST BUTONU BİTİŞİ
+
                 // 3. En Alt: Yeni Alışveriş Başlat Butonu
                 Button(action: {
                     // ViewModel'e "Bana yeni bir sepet ver" diyoruz
