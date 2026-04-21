@@ -5,59 +5,71 @@
 //  Created by Korkut Eryiğit on 28.02.2026.
 //
 
+import SwiftUI
 import Foundation
 import SwiftData
 
 @Observable
+@MainActor
 final class AddItemViewModel{
-    var productName: String = ""
-    var priceString: String = "" // Kullanıcıdan metin olarak alıp kaydederken Decimal'a çevireceğiz
-    var quantity: Int = 1
-    var category: String = "Gıda"
-    var barcode: String = ""
     
-    // Analizlerin düzgün çalışması için sistemin kabul edeceği sabit kategoriler
-    let categories = ["Gıda", "İçecek", "Atıştırmalık", "Temizlik", "Kişisel Bakım", "Manav", "Diğer"]
+    let cameraService = CameraService()
+    let pipeline = ImageProcessingPipeline()
     
-    // Barkod okunduğunda veya API cevap verdiğinde bu sınıf başlatılacak
-    init(scannedBarcode: String, apiName: String?){
-        self.barcode = scannedBarcode
-        if let name = apiName, !name.isEmpty{
-            self.productName = name
+    // STATE'LER (UI'ı Yönetecek Değişkenler)
+    var isProcessing: Bool = false
+    var ocrResult: PriceTagData? = nil
+    var errorMessage: String? = nil
+    var showConfirmation: Bool = false
+    
+    func captureAndProcess() {
+        // Eğer zaten bir işlem sürüyorsa butona art arda basılmasını engelle
+        guard !isProcessing else { return }
+        
+        isProcessing = true
+        errorMessage = nil
+        ocrResult = nil
+        
+        Task {
+            do {
+                // Kameradan görüntüyü al
+                let image = try await cameraService.capturePhoto()
+                
+                // Görüntüyü boru hattına (Pipeline) gönder
+                let result = await pipeline.process(image: image)
+                
+                // Pipeline'dan dönen sonuca göre UI state'lerini güncelle
+                switch result {
+                case .success(let data):
+                    self.ocrResult = data
+                    self.showConfirmation = true
+                case .failure(let error):
+                    self.errorMessage = error.localizedDescription
+                }
+            } catch {
+                self.errorMessage = "Kamera hatası: Fotoğraf çekilemedi."
+            }
+            self.isProcessing = false
         }
     }
     
-    func saveItem(context: ModelContext, activeSession: ShoppingSession){
-        // 1. Fiyat Dönüşüm Riski: Kullanıcı virgül veya nokta girebilir.
-        // Hatalı girişte uygulamanın çökmesini engellemek için formatlama.
+    // 2. Onaylanan Ürünü Veritabanına Kaydet
+    func confirmItem(editedName: String, editedPrice: Decimal, category: String, activeSession: ShoppingSession, context: ModelContext) {
         
-        let formattedPrice = priceString.replacingOccurrences(of: ",", with: ".")
-        let price = Decimal(string: formattedPrice) ?? 0.0
-        
-        // 2. Yeni ürünü oluştur
+        // Yeni ürün nesnesini oluştur (Barkod opsiyonel olduğu için nil kalacak)
         let newItem = ShoppingItem(
-            id: UUID(),
-            productName: productName,
-            price: price,
+            productName: editedName,
+            price: editedPrice,
             category: category,
-            barcode: barcode,
-            quantity: quantity
+            session: activeSession
         )
         
-        // 3. İlişkiyi kur (Ürünü mevcut sepete bağla)
-        // DİKKAT: activeSession.items nil ise diye boş dizi ataması yapmıyoruz çünkü ShoppingSession init'inde boş dizi olarak tanımladık.
+        // Veritabanı işlemleri
         activeSession.items?.append(newItem)
-        newItem.session = activeSession
+        context.insert(newItem)
         
-        // 4. Sepetin genel toplamını güncelle
-        let itemTotal = price * Decimal(quantity)
-        activeSession.totalAmount += itemTotal
-        
-        // 5. Veritabanına yaz
-        do {
-            try context.save()
-        } catch {
-            print("Kritik Hata: Veritabanına kayıt yapılamadı. Neden: \(error.localizedDescription)")
-        }
+        // Ekranı temizle ve onayı kapat
+        self.showConfirmation = false
+        self.ocrResult = nil
     }
 }

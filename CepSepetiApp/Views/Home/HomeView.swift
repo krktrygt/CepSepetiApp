@@ -114,11 +114,22 @@ struct HomeView: View {
                 // GEÇİCİ OCR + GEMİNİ TEST BUTONU
 
                 // 3. En Alt: Yeni Alışveriş Başlat Butonu
+                // 3. En Alt: Yeni Alışveriş Başlat Butonu
                 Button(action: {
-                    // ViewModel'e "Bana yeni bir sepet ver" diyoruz
-                    let newSession = viewModel.createNewSession(context: context)
+                    // GERÇEK TEST BAĞLANTISI:
+                    // SwiftData'da anında yeni bir sepet (oturum) oluşturuyoruz
+                    let newSession = ShoppingSession(
+                        id: UUID(),
+                        date: Date(),
+                        totalAmount: 0.0,
+                        isCompleted: false
+                    )
+                    
+                    // Veritabanına ekle
+                    context.insert(newSession)
+                    
+                    // currentSession'ı doldurduğumuz an fullScreenCover tetiklenir ve kamera açılır
                     self.currentSession = newSession
-                    self.showScanner = true // Kamerayı tetikle
                 }) {
                     HStack {
                         Image(systemName: "cart.badge.plus")
@@ -135,9 +146,11 @@ struct HomeView: View {
                 .padding(.bottom, 8)
             }
             .navigationTitle("Cep Sepeti")
+            
             // Kamera ekranını tam sayfa (FullScreenCover) olarak açıyoruz
             .fullScreenCover(item: $currentSession) { session in
-                BarcodeScannerView(activeSession: session)
+                // DİKKAT: Kendi verdiğin yeni dosya adını buraya yaz (örneğin ScannerView)
+                ScannerView(activeSession: session)
             }
         }
     }

@@ -12,88 +12,82 @@ struct AddProductView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
     
-    // İş mantığını yönetecek ViewModel'imiz
-    @State private var viewModel: AddItemViewModel
+    // ViewModel'i dışarıdan alıyoruz, çünkü süreci kamera ekranı (CameraPreviewView) başlatacak
+    @Bindable var viewModel: AddItemViewModel
+    let activeSession: ShoppingSession
     
-    // Ürünün ekleneceği aktif alışveriş sepeti/
-    var activeSession: ShoppingSession
+    // Kullanıcının textfield'lar üzerinde değişiklik yapabilmesi için yerel state'ler
+    @State private var editedName: String = ""
+    @State private var editedPrice: Decimal = 0.0
+    @State private var selectedCategory: String = "Gıda"
     
-    // View oluşturulurken dışarıdan alınacak veriler
-    init(scannedBarcode: String, apiName: String?, session: ShoppingSession) {
-        // ViewModel'i dışarıdan gelen verilerle başlatıyoruz
-        _viewModel = State(initialValue: AddItemViewModel(scannedBarcode: scannedBarcode, apiName: apiName))
-        self.activeSession = session
-    }
+    // Şimdilik basit bir kategori listesi
+    let categories = ["Gıda", "İçecek", "Temizlik", "Atıştırmalık", "Kozmetik", "Diğer"]
     
     var body: some View {
+        
         NavigationStack{
             Form{
-                // 1. Ürün bilgileri bölümü
-                Section(header: Text("Ürün Bilgileri")){
-                    TextField("Ürün Adı:", text: $viewModel.productName)
-                        .textInputAutocapitalization(.words)
+                Section(header: Text("Ürün Bilgileri (Düzenlenebilir")){
+                    TextField("Ürün Adı", text: $editedName)
                     
-                    Text("Barkod: \(viewModel.barcode)")
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                }
-                
-                // 2. Fiyat ve Adet Bölümü
-                Section(header: Text("Fiyat ve Miktar")){
-                    HStack{
-                        Text("Fiyat (₺):")
-                        Spacer()
-                        TextField("0.00", text: $viewModel.priceString)
-                            .keyboardType(.decimalPad) // Sadece rakam ve virgül/nokta klavyesi
-                            .multilineTextAlignment(.trailing)
-                            .foregroundColor(.blue)
-                    }
+                    TextField("Fiyat (₺)", value: $editedPrice, format: .number)
+                        .keyboardType(.decimalPad)
                     
-                    Stepper(value: $viewModel.quantity, in: 1...100){
-                        Text("Adet: \(viewModel.quantity)")
-                    }
-                }
-                
-                // 3. Kategori Bölümü
-                Section(header: Text("Kategori")){
-                    Picker("Kategori seç", selection: $viewModel.category) {
-                        ForEach(viewModel.categories, id: \.self) { category in
-                            Text(category).tag(category)
+                    Picker("Kategori", selection: $selectedCategory) {
+                        ForEach(categories, id: \.self) {
+                            Text($0)
                         }
                     }
-                    .pickerStyle(.menu)
+                }
+                
+                // Eğer Gemini markayı bulabildiyse ekstra bilgi olarak göster
+                if let brand = viewModel.ocrResult?.brand {
+                    Section(header: Text("Ekstra Bilgiler")) {
+                        HStack {
+                            Text("Marka")
+                            Spacer()
+                            Text(brand).foregroundColor(.gray)
+                        }
+                    }
+                }
+                
+                Section {
+                    Button(action: {
+                        // Kullanıcı onayladığında ViewModel üzerinden SwiftData'ya kaydet
+                        viewModel.confirmItem(
+                            editedName: editedName,
+                            editedPrice: editedPrice,
+                            category: selectedCategory,
+                            activeSession: activeSession,
+                            context: context
+                        )
+                        dismiss() // Modalı kapat
+                    }) {
+                        Text("Sepete Ekle")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .foregroundColor(.white)
+                    }
+                    .listRowBackground(Color.blue)
                 }
             }
-            .navigationTitle("Ürünü Sepete Ekle")
+            .navigationTitle("Ürünü Onayla")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar{
-                // Sol üst iptal butonu
-                ToolbarItem(placement: .topBarLeading) {
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
                     Button("İptal") {
+                        viewModel.showConfirmation = false
+                        viewModel.ocrResult = nil
                         dismiss()
                     }
-                    .foregroundColor(.red)
                 }
-                                
-                // Sağ üst kaydet butonu
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Kaydet") {
-                        // İş mantığını ViewModel'e devret
-                        viewModel.saveItem(context: context, activeSession: activeSession)
-                        dismiss() // Ekranı kapat
-                    }
-                    // Ürün adı veya fiyat boşsa butonu pasif (disabled) yap
-                    .disabled(viewModel.productName.trimmingCharacters(in: .whitespaces).isEmpty || viewModel.priceString.isEmpty)
-                }
-                                
-                // UX İyileştirmesi: DecimalPad klavyesini kapatmak için "Bitti" butonu
-                ToolbarItem(placement: .keyboard) {
-                    HStack {
-                        Spacer()
-                        Button("Bitti") {
-                            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                        }
-                    }
+            }
+            .onAppear {
+                // Ekran açıldığında OCR'dan gelen verileri TextField'lara doldur
+                if let result = viewModel.ocrResult {
+                    self.editedName = result.productName
+                    self.editedPrice = result.price
                 }
             }
         }
