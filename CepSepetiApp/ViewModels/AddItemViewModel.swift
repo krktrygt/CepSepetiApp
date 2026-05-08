@@ -54,13 +54,14 @@ final class AddItemViewModel{
     }
     
     // 2. Onaylanan Ürünü Veritabanına Kaydet
-    func confirmItem(editedName: String, editedPrice: Decimal, category: String, activeSession: ShoppingSession, context: ModelContext) {
+    func confirmItem(editedName: String, editedPrice: Decimal, category: String, quantity: Int, activeSession: ShoppingSession, context: ModelContext) {
         
         // Yeni ürün nesnesini oluştur (Barkod opsiyonel olduğu için nil kalacak)
         let newItem = ShoppingItem(
             productName: editedName,
             price: editedPrice,
             category: category,
+            quantity: quantity,
             session: activeSession
         )
         

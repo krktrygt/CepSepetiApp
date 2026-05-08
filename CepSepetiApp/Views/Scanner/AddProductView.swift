@@ -19,6 +19,7 @@ struct AddProductView: View {
     // Kullanıcının textfield'lar üzerinde değişiklik yapabilmesi için yerel state'ler
     @State private var editedName: String = ""
     @State private var editedPrice: Decimal = 0.0
+    @State private var quantity: Int = 1
     @State private var selectedCategory: String = "Gıda"
     
     // Şimdilik basit bir kategori listesi
@@ -33,6 +34,9 @@ struct AddProductView: View {
                     
                     TextField("Fiyat (₺)", value: $editedPrice, format: .number)
                         .keyboardType(.decimalPad)
+                    
+                    TextField("Miktar", value: $quantity, format: .number)
+                        .keyboardType(.numberPad)
                     
                     Picker("Kategori", selection: $selectedCategory) {
                         ForEach(categories, id: \.self) {
@@ -59,6 +63,7 @@ struct AddProductView: View {
                             editedName: editedName,
                             editedPrice: editedPrice,
                             category: selectedCategory,
+                            quantity: quantity,
                             activeSession: activeSession,
                             context: context
                         )

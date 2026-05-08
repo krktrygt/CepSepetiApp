@@ -13,6 +13,7 @@ struct ScannerView: View {
     
     // ViewModel bu ekranın sahibi, isProcessing ve ocrResult state'lerini buradan yönetecek
     @State private var viewModel = AddItemViewModel()
+    @State private var showCart: Bool = false
     
     // Bu tarama oturumunun ait olduğu ana alışveriş oturumu
     let activeSession: ShoppingSession
@@ -44,6 +45,20 @@ struct ScannerView: View {
                                 .foregroundColor(.white)
                                 .padding()
                         }
+                        
+                        Spacer()
+                        
+                        Button(action: {
+                            showCart = true
+                        }) {
+                            Image(systemName: "cart.fill")
+                                .font(.system(size: 25))
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(Color.black.opacity(0.5))
+                                .clipShape(Circle())
+                        }
+                        .padding(.trailing, 20)
                         
                         Spacer()
                         
@@ -128,6 +143,9 @@ struct ScannerView: View {
             .onDisappear {
                 viewModel.cameraService.stop()
             }
+        }
+        .sheet(isPresented: $showCart) {
+            CartSheetView(activeSession: activeSession)
         }
     }
 }

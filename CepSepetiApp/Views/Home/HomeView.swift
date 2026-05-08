@@ -11,41 +11,18 @@ import SwiftData
 struct HomeView: View {
     @Environment(\.modelContext) private var context
     
-    // İş mantığını yönetecek sınıfımız
-    @State private var viewModel = HomeViewModel()
+    // Sadece tamamlanmış alışverişleri getir
+    @Query(filter: #Predicate<ShoppingSession> { $0.isCompleted }, sort: \ShoppingSession.date, order: .reverse) private var sessions: [ShoppingSession]
     
-    // Veritabanından tüm alışverişleri tarihe göre en yeniden eskiye doğru otomatik çek (Reaktif Makro)
-    @Query(sort: \ShoppingSession.date, order: .reverse) private var sessions: [ShoppingSession]
-    
-    // Yeni alışveriş başladığında kamerayı tam ekran açmak için state ve aktif sepet
-    @State private var showScanner: Bool = false
     @State private var currentSession: ShoppingSession?
 
     var body: some View {
         NavigationStack {
             VStack {
-                // 1. Üst Kısım: Aylık Özet Kartı
-                VStack(spacing: 8) {
-                    Text("Bu Ayki Harcama")
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                    
-                    // ViewModel'den dönen Decimal verisini Currency (Para Birimi) formatında yazdır
-                    Text(viewModel.calculateMonthlyTotal(sessions: sessions), format: .currency(code: "TRY"))
-                        .font(.system(size: 34, weight: .bold, design: .rounded))
-                        .foregroundColor(.primary)
-                }
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(Color.blue.opacity(0.1))
-                .cornerRadius(16)
-                .padding(.horizontal)
-                
-                // 2. Alt Kısım: Geçmiş Alışverişler Listesi
                 List {
                     Section(header: Text("Geçmiş Alışverişler")) {
                         if sessions.isEmpty {
-                            Text("Henüz bir alışveriş kaydınız yok.")
+                            Text("Henüz tamamlanmış bir alışveriş kaydınız yok.")
                                 .foregroundColor(.gray)
                                 .font(.callout)
                         } else {
@@ -63,72 +40,20 @@ struct HomeView: View {
                                         .bold()
                                 }
                             }
-                            .onDelete { indexSet in
-                                // Sağa kaydırarak silme işlemi
-                                for index in indexSet {
-                                    viewModel.deleteSession(session: sessions[index], context: context)
-                                }
-                            }
+                            .onDelete(perform: deleteSession)
                         }
                     }
                 }
                 .listStyle(.insetGrouped)
-                // GEÇİCİ OCR + GEMINI TEST BUTONU
+                
                 Button(action: {
-                    // GEÇİCİ KAMERA TEST BUTONU
-                    Task {
-                        let camera = CameraService()
-                        camera.start()
-                        print("📸 Kamera başlatıldı, odaklanılıyor...")
-                        
-                        // Kameranın açılması için 1-2 saniye sistemin toparlanmasını bekle
-                        try? await Task.sleep(nanoseconds: 2_000_000_000)
-                        
-                        do {
-                            print("📸 Deklanşöre basılıyor...")
-                            let capturedImage = try await camera.capturePhoto()
-                            print("✅ BAŞARILI! Fotoğraf çekildi.")
-                            print("📊 Görüntü Boyutu: \(capturedImage.size.width) x \(capturedImage.size.height)")
-                        } catch {
-                            print("❌ HATA: Kamera fotoğraf çekemedi. Detay: \(error)")
-                        }
-                        
-                        camera.stop()
-                    }
-
-
-                }) {
-                    HStack {
-                        Image(systemName: "sparkles")
-                        Text("Uçtan Uca Sistemi Test Et")
-                    }
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.purple)
-                    .cornerRadius(12)
-                }
-                .padding(.horizontal)
-                .padding(.bottom, 8)
-                // GEÇİCİ OCR + GEMİNİ TEST BUTONU
-
-                // 3. En Alt: Yeni Alışveriş Başlat Butonu
-                // 3. En Alt: Yeni Alışveriş Başlat Butonu
-                Button(action: {
-                    // GERÇEK TEST BAĞLANTISI:
-                    // SwiftData'da anında yeni bir sepet (oturum) oluşturuyoruz
                     let newSession = ShoppingSession(
                         id: UUID(),
                         date: Date(),
                         totalAmount: 0.0,
                         isCompleted: false
                     )
-                    
-                    // Veritabanına ekle
                     context.insert(newSession)
-                    
-                    // currentSession'ı doldurduğumuz an fullScreenCover tetiklenir ve kamera açılır
                     self.currentSession = newSession
                 }) {
                     HStack {
@@ -146,12 +71,15 @@ struct HomeView: View {
                 .padding(.bottom, 8)
             }
             .navigationTitle("Cep Sepeti")
-            
-            // Kamera ekranını tam sayfa (FullScreenCover) olarak açıyoruz
             .fullScreenCover(item: $currentSession) { session in
-                // DİKKAT: Kendi verdiğin yeni dosya adını buraya yaz (örneğin ScannerView)
                 ScannerView(activeSession: session)
             }
+        }
+    }
+    
+    private func deleteSession(offsets: IndexSet) {
+        for index in offsets {
+            context.delete(sessions[index])
         }
     }
 }
