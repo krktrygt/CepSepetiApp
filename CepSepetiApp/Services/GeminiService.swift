@@ -7,46 +7,56 @@
 
 import Foundation
 
+/// A service that interacts with Google's Gemini AI API to analyze and parse OCR text into structured data.
+/// OCR metnini analiz etmek ve yapılandırılmış verilere ayrıştırmak için Google'ın Gemini AI API'si ile etkileşime giren bir servis.
 final class GeminiService {
     
-    // API Anahtarını plist'ten güvenli bir şekilde okuyan property
+    /// Retrieves the Gemini API key from the Secrets.plist file.
+    /// Gemini API anahtarını Secrets.plist dosyasından alır.
     private var apiKey: String {
         guard let filePath = Bundle.main.path(forResource: "Secrets", ofType: "plist"),
               let plist = NSDictionary(contentsOfFile: filePath),
               let value = plist.object(forKey: "GEMINI_API_KEY") as? String,
               !value.isEmpty else {
-            fatalError("HATA: Secrets.plist dosyası veya GEMINI_API_KEY bulunamadı!")
+            fatalError("ERROR: Secrets.plist file or GEMINI_API_KEY not found!")
         }
         return value
     }
     
-    // Gemini 2.5 Flash modelini kullanıyor
+    /// The API endpoint for the Gemini 2.5 Flash model.
+    /// Gemini 2.5 Flash modeli için API uç noktası.
     private let endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
     
+    /// Sends OCR text to the Gemini AI and parses the response into a PriceTagData object.
+    /// OCR metnini Gemini AI'ya gönderir ve yanıtı bir PriceTagData nesnesine ayrıştırır.
+    /// - Parameter ocrText: The raw text extracted from an image.
+    /// - Returns: A structured PriceTagData object.
     func parse(ocrText: String) async throws -> PriceTagData {
         guard let url = URL(string: "\(endpoint)?key=\(apiKey)") else {
             throw OCRError.parsingFailed
         }
         
-        // LLM'i kısıtladığımız katı prompt (Sistem Komutu)
+        // Detailed prompt to guide the LLM to extract product name, price, and brand in a strict JSON format.
+        // LLM'in ürün adını, fiyatını ve markasını katı bir JSON formatında çıkarmasını sağlamak için ayrıntılı prompt.
         let prompt = """
-            Aşağıdaki metin bir market etiketinin OCR çıktısıdır. Görevin sadece asıl satış fiyatını ve ürünün adını bulmaktır.
-            Kurallar:
-            1. Birim fiyatlarını (örneğin 1kg=40TL veya adet=10TL gibi) ve barkod numaralarını yoksay.
-            2. Fiyat alanında virgül kullanılmışsa bunu ondalık formatta noktaya çevir (Örn: 349,00 -> 349.00).
-            3. Ürün adındaki küçük OCR harf hatalarını (örn: 'aktue!' -> 'aktüel') mantıklıysa düzelt. Markayı bulabiliyorsan yaz.
-            4. Çıktıyı KESİNLİKLE VE SADECE aşağıdaki JSON formatında ver. Başka hiçbir açıklama, markdown veya kod bloğu ekleme:
-            {"productName": "Ürün Adı", "price": 0.00, "brand": "Marka", "rawOCRText": "orijinal_metin"}
+            The following text is OCR output from a supermarket price tag. Your task is to find only the actual selling price and the product name.
+            Rules:
+            1. Ignore unit prices (e.g., 1kg=40TL or unit=10TL) and barcode numbers.
+            2. If commas are used in the price field, convert them to dots for decimal format (Ex: 349,00 -> 349.00).
+            3. Correct minor OCR character errors in the product name (ex: 'aktue!' -> 'aktüel') if it makes sense. Write the brand if you can find it.
+            4. Provide the output STRICTLY AND ONLY in the following JSON format. Do not add any other explanation, markdown, or code blocks:
+            {"productName": "Product Name", "price": 0.00, "brand": "Brand", "rawOCRText": "original_text"}
                 
-            OCR Metni:
+            OCR Text:
             \(ocrText)
             """
-        // Gemini API'nin beklediği Body formatı
+        
+        // Define the request body format expected by the Gemini API.
+        // Gemini API tarafından beklenen istek gövdesi formatını tanımlayın.
         let requestBody: [String: Any] = [
             "contents": [
                 ["parts": [["text": prompt]]]
             ],
-            // Çıktıyı zorla JSON formatında vermesini istiyoruz
             "generationConfig": [
                 "responseMimeType": "application/json"
             ]
@@ -57,29 +67,27 @@ final class GeminiService {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try? JSONSerialization.data(withJSONObject: requestBody)
         
-        // Ağ isteğini atıyoruz
+        // Execute the network request.
+        // Ağ isteğini gerçekleştirin.
         let (data, response) = try await URLSession.shared.data(for: request)
         
-        
-        // HATA AYIKLAMA (DEBUG) BLOĞU
+        // Debugging block for HTTP response status.
+        // HTTP yanıt durumu için hata ayıklama bloğu.
         if let httpResponse = response as? HTTPURLResponse {
-            print("📡 HTTP Durum Kodu: \(httpResponse.statusCode)")
+            print("📡 HTTP Status Code: \(httpResponse.statusCode)")
             
             if httpResponse.statusCode != 200 {
-                // Eğer hata aldıysak, Google'ın gönderdiği JSON hata detayını string olarak bas
-                let serverErrorMessage = String(data: data, encoding: .utf8) ?? "Mesaj okunamadı"
-                print("🚨 GOOGLE API HATA DETAYI:\n\(serverErrorMessage)")
-                throw OCRError.geminiError("Sunucu Hatası. Kod: \(httpResponse.statusCode)")
+                let serverErrorMessage = String(data: data, encoding: .utf8) ?? "Message not readable"
+                print("🚨 GOOGLE API ERROR DETAIL:\n\(serverErrorMessage)")
+                throw OCRError.geminiError("Server Error. Code: \(httpResponse.statusCode)")
             }
         } else {
-            throw OCRError.geminiError("Geçersiz sunucu yanıtı.")
+            throw OCRError.geminiError("Invalid server response.")
         }
 
-        
-        // Gelen JSON verisini PriceTagData struct'ımıza dönüştürüyoruz
+        // Parse the hierarchical JSON response from Gemini into PriceTagData.
+        // Gemini'den gelen hiyerarşik JSON yanıtını PriceTagData'ya ayrıştırın.
         do {
-            // Gemini bazen JSON'ı "candidates" -> "content" -> "parts" -> "text" içinde string olarak döndürür.
-            // Bu içiçe yapıyı açmamız gerekiyor.
             let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
             guard let candidates = json?["candidates"] as? [[String: Any]],
                     let content = candidates.first?["content"] as? [String: Any],
@@ -90,7 +98,8 @@ final class GeminiService {
             }
                    
             var parsedData = try JSONDecoder().decode(PriceTagData.self, from: finalData)
-            // Debug için orijinal metni de içine gömüyoruz
+            // Re-embed the original OCR text for debugging purposes.
+            // Hata ayıklama amacıyla orijinal OCR metnini yeniden gömün.
             parsedData = PriceTagData(productName: parsedData.productName,
                                         price: parsedData.price,
                                         brand: parsedData.brand,
@@ -98,8 +107,19 @@ final class GeminiService {
             return parsedData
                    
         } catch {
-            throw OCRError.geminiError("Gelen veri anlaşılamadı.")
+            throw OCRError.geminiError("Incoming data could not be understood.")
         }
     }
-    
 }
+
+/*
+ SUMMARY:
+ GeminiService acts as the intelligence layer of the app. It uses Large Language Models to transform 
+ messy OCR text into clean, structured data. It defines the prompting logic and handles API communication.
+ It is orchestrated by ImageProcessingPipeline.
+ 
+ ÖZET:
+ GeminiService, uygulamanın zeka katmanı olarak görev yapar. Karışık OCR metnini temiz, yapılandırılmış verilere 
+ dönüştürmek için Büyük Dil Modellerini (LLM) kullanır. Prompt mantığını tanımlar ve API iletişimini yönetir.
+ ImageProcessingPipeline tarafından koordine edilir.
+ */

@@ -7,9 +7,31 @@
 
 import Foundation
 
-struct PriceTagData: Codable{
+/// Represents the structured data extracted from a physical price tag using OCR.
+/// OCR kullanılarak fiziksel bir fiyat etiketinden çıkarılan yapılandırılmış verileri temsil eder.
+struct PriceTagData: Codable {
+    /// The name of the product identified from the price tag.
+    /// Fiyat etiketinden tanımlanan ürünün adı.
     let productName: String
+    /// The price of the product.
+    /// Ürünün fiyatı.
     let price: Decimal
+    /// The brand of the product, if identifiable.
+    /// Tanımlanabiliyorsa ürünün markası.
     let brand: String?
-    let rawOCRText: String // Debug süreci için ham metni tutma
+    /// The original, unprocessed text captured by the OCR system (used for debugging).
+    /// OCR sistemi tarafından yakalanan orijinal, işlenmemiş metin (hata ayıklama için kullanılır).
+    let rawOCRText: String 
 }
+
+/*
+ SUMMARY:
+ PriceTagData is a data model used to store the results of price tag analysis.
+ It is populated by the GeminiService after processing an image and is used by 
+ the AddItemViewModel to prepopulate the product addition form.
+ 
+ ÖZET:
+ PriceTagData, fiyat etiketi analizinin sonuçlarını saklamak için kullanılan bir veri modelidir.
+ Bir görüntüyü işledikten sonra GeminiService tarafından doldurulur ve AddItemViewModel tarafından 
+ ürün ekleme formunu önceden doldurmak için kullanılır.
+ */

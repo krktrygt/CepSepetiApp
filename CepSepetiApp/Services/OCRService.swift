@@ -9,42 +9,47 @@ import Foundation
 import Vision
 import UIKit
 
+/// A service that uses Apple's Vision framework to perform Optical Character Recognition (OCR) locally on the device.
+/// Cihaz üzerinde yerel olarak Optik Karakter Tanıma (OCR) gerçekleştirmek için Apple'ın Vision çerçevesini kullanan bir servis.
 final class OCRService {
     
+    /// Recognizes text from a given image using the Vision framework.
+    /// Vision çerçevesini kullanarak verilen bir görüntüden metni tanır.
+    /// - Parameter image: The source UIImage.
+    /// - Returns: A single string containing all recognized text separated by newlines.
     func recognizeText(from image: UIImage) async throws -> String {
         guard let cgImage = image.cgImage else {
             throw OCRError.parsingFailed
         }
         
-        // Ana thread'i dondurmamak için işlemimizi tamamen bağımsız (detached)
-        // bir arka plan görevine atıyoruz.
+        // Execute the processing in a detached task to keep the main thread free and comply with concurrency rules.
+        // Ana iş parçacığını serbest tutmak ve eşzamanlılık kurallarına uymak için işlemi bağımsız (detached) bir görevde yürütün.
         return try await Task.detached(priority: .userInitiated) {
             return try await withCheckedThrowingContinuation { continuation in
                 
-                // 1. DİKKAT: Vision objelerini DIŞARIDA değil, arka plan görevinin
-                // tam İÇİNDE oluşturuyoruz. Böylece Sendable kuralını ihlal etmiyoruz.
+                // Initialize the text recognition request.
+                // Metin tanıma isteğini başlatın.
                 let request = VNRecognizeTextRequest { request, error in
-                    // Apple çerçevesinden gelen dahili hatalar
                     if error != nil {
                         continuation.resume(throwing: OCRError.parsingFailed)
                         return
                     }
                     
-                    // Sonuçların alınması ve boş olup olmadığının kontrolü
+                    // Filter and extract observations from the results.
+                    // Sonuçlardan gözlemleri filtreleyin ve çıkarın.
                     guard let observations = request.results as? [VNRecognizedTextObservation], !observations.isEmpty else {
                         continuation.resume(throwing: OCRError.noTextFound)
                         return
                     }
                     
-                    // Okunan metin kutularının (bounding boxes) içindeki en güvenilir (.topCandidates(1)) verileri string olarak çekiyoruz
+                    // Map observations to their most likely string representations.
+                    // Gözlemleri en olası dize temsilcileriyle eşleyin.
                     let recognizedStrings = observations.compactMap { observation in
                         observation.topCandidates(1).first?.string
                     }
                     
-                    // Alt alta duran metinleri birleştirip tek bir metin bloğu haline getiriyoruz
                     let fullText = recognizedStrings.joined(separator: "\n")
                     
-                    // Eğer sadece boşluklardan oluşan anlamsız bir şey döndüyse hata fırlat
                     if fullText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         continuation.resume(throwing: OCRError.noTextFound)
                     } else {
@@ -52,16 +57,17 @@ final class OCRService {
                     }
                 }
                 
-                // Konfigürasyonlar
+                // Configure request for high accuracy and specific languages.
+                // İsteği yüksek doğruluk ve belirli diller için yapılandırın.
                 request.recognitionLevel = .accurate
                 request.usesLanguageCorrection = true
                 request.recognitionLanguages = ["tr-TR", "en-US"]
+                // Custom keywords to improve recognition of grocery-related terms.
+                // Marketle ilgili terimlerin tanınmasını iyileştirmek için özel anahtar kelimeler.
                 request.customWords = ["TL", "₺", "KDV", "Fiyatı", "Adet", "İndirim", "kg", "lt", "ml"]
                 
                 let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
                 
-                // 2. Zaten Task.detached sayesinde arka planda olduğumuz için
-                // tekrar DispatchQueue kullanmamıza gerek kalmıyor. Doğrudan çalıştırıyoruz.
                 do {
                     try handler.perform([request])
                 } catch {
@@ -71,3 +77,15 @@ final class OCRService {
         }.value
     }
 }
+
+/*
+ SUMMARY:
+ OCRService wraps the Vision framework's text recognition capabilities. 
+ it provides a modern async/await interface for extracting text from images locally.
+ It is the first step in the image processing pipeline.
+ 
+ ÖZET:
+ OCRService, Vision çerçevesinin metin tanıma yeteneklerini sarmalar.
+ Görüntülerden yerel olarak metin çıkarmak için modern bir asenkron/bekleme (async/await) arayüzü sağlar.
+ Görüntü işleme hattındaki ilk adımdır.
+ */
