@@ -21,7 +21,10 @@ struct PriceTagData: Codable {
     let brand: String?
     /// The original, unprocessed text captured by the OCR system (used for debugging).
     /// OCR sistemi tarafından yakalanan orijinal, işlenmemiş metin (hata ayıklama için kullanılır).
-    let rawOCRText: String 
+    let rawOCRText: String
+    /// The confidence score of the parsing result (0.0 to 1.0).
+    /// Ayrıştırma sonucunun güven puanı (0.0 ile 1.0 arası).
+    var confidenceScore: Double?
 }
 
 /*

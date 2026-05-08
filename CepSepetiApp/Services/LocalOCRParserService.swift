@@ -1,0 +1,285 @@
+//
+//  LocalOCRParserService.swift
+//  CepSepetiApp
+//
+//  Created by Korkut Eryiğit on 21.04.2026.
+//
+
+import Foundation
+
+/// A fully local Swift-based parser service to extract product info from raw OCR text.
+/// Bu servis, ham OCR metninden ürün bilgilerini çıkarmak için tamamen yerel Swift tabanlı ayrıştırıcıdır.
+final class LocalOCRParserService {
+    
+    // Known unit keywords to classify sizes
+    private let validUnits = ["G", "GR", "KG", "L", "LT", "LITRE", "LİTRE", "ML", "CC", "ADET", "PAKET"]
+    
+    // Known brands and their common OCR typos for normalization
+    private let brandNormalizations: [String: String] = [
+        "M1LK": "MILK", "ULKER": "ÜLKER", "SUTAS": "SÜTAŞ", "PINAR": "PINAR",
+        "ETI": "ETİ", "ETI.": "ETİ", "AYTAÇ": "AYTAÇ", "AYTAC": "AYTAÇ", "TORKU": "TORKU",
+        "NESTLE": "NESTLÉ", "MİLKA": "MILKA", "MILKA": "MILKA",
+        "COCA-COLA": "COCA-COLA", "COCA COLA": "COCA-COLA", "PEPSI": "PEPSI", "PEPSİ": "PEPSI", "LIPTON": "LIPTON", "LİPTON": "LIPTON",
+        "DANONE": "DANONE", "ALGİDA": "ALGIDA", "ALGIDA": "ALGIDA", "UNO": "UNO", "ŞÖLEN": "ŞÖLEN", "SOLEN": "ŞÖLEN",
+        "BEYPAZARI": "BEYPAZARI", "BEYPAZAR": "BEYPAZARI", "KIZILAY": "KIZILAY", "SARIKIZ": "SARIKIZ",
+        "ÇAYKUR": "ÇAYKUR", "CAYKUR": "ÇAYKUR", "DOĞUŞ": "DOĞUŞ", "DOGUS": "DOĞUŞ",
+        "SIRMA": "SIRMA", "HAYAT": "HAYAT", "ERİKLİ": "ERİKLİ", "ERIKLI": "ERİKLİ",
+        "FUSETEA": "FUSE TEA", "FUSE TEA": "FUSE TEA", "DİDİ": "DİDİ", "DIDI": "DİDİ",
+        "TAMEK": "TAMEK", "CAPPY": "CAPPY", "DIMES": "DİMES", "DİMES": "DİMES",
+        "FRUKO": "FRUKO", "YEDİGÜN": "YEDİGÜN", "YEDIGUN": "YEDİGÜN", "ULUDAG": "ULUDAĞ", "ULUDAĞ": "ULUDAĞ",
+        "FANTA": "FANTA", "SPRITE": "SPRITE", "SCHWEPPES": "SCHWEPPES",
+        "BINGO": "BİNGO", "BİNGO": "BİNGO", "ARIEL": "ARİEL", "ARİEL": "ARİEL", "OMO": "OMO", "ALO": "ALO", "RINSO": "RİNSO", "RİNSO": "RİNSO",
+        "FAIRY": "FAIRY", "PRIL": "PRİL", "PRİL": "PRİL", "FINISH": "FINISH", "FİNİSH": "FINISH",
+        "DOMESTOS": "DOMESTOS", "MARMARABİRLİK": "MARMARABİRLİK", "MARMARABIRLIK": "MARMARABİRLİK",
+        "BALKÜPÜ": "BALKÜPÜ", "BALKUPU": "BALKÜPÜ", "IRMAK": "IRMAK", "SÖKE": "SÖKE", "SOKE": "SÖKE",
+        "OFÇAY": "OFÇAY", "OFCAY": "OFÇAY", "KARALİ": "KARALİ", "KARALI": "KARALİ",
+        "KOMİLİ": "KOMİLİ", "KOMILI": "KOMİLİ", "YUDUM": "YUDUM", "ZEYTİNYAĞI": "ZEYTİNYAĞI",
+        "İÇİM": "İÇİM", "ICIM": "İÇİM", "SEK": "SEK", "YÖRSAN": "YÖRSAN", "YORSAN": "YÖRSAN",
+        "KINDER": "KINDER", "KİNDER": "KINDER", "NUTELLA": "NUTELLA", "TADELLE": "TADELLE",
+        "HALLEY": "HALLEY", "BİSKREM": "BİSKREM", "BISKREM": "BİSKREM", "ÇOKOKREM": "ÇOKOKREM", "COKOKREM": "ÇOKOKREM",
+        "LAYS": "LAY'S", "LAY'S": "LAY'S", "RUFFLES": "RUFFLES", "DORITOS": "DORITOS", "DORİTOS": "DORITOS",
+        "ÇEREZZA": "ÇEREZZA", "CEREZZA": "ÇEREZZA", "PATİTO": "PATİTO", "PATITO": "PATİTO"
+    ]
+    
+    // Invalid brands (Logos or generic words often appearing at the top)
+    private let invalidBrands: Set<String> = ["YERLİ", "YERLI", "ÜRETİM", "URETIM", "KDV", "İNDİRİM", "INDIRIM"]
+    
+    /// Parses raw OCR text to extract product details and calculate a confidence score.
+    func parse(ocrText: String) -> PriceTagData {
+        let lines = ocrText.components(separatedBy: .newlines)
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            
+        let brand = extractBrand(from: lines)
+        let (nameTokens, sizeInKg) = extractNameAndSize(from: lines, brand: brand)
+        let name = nameTokens.joined(separator: " ")
+        
+        let (priceDecimal, conflictingPrices) = extractPrice(from: lines, sizeInKg: sizeInKg)
+        
+        var confidenceScore = 1.0
+        
+        if priceDecimal == 0 {
+            confidenceScore = 0.0
+        } else if conflictingPrices {
+            confidenceScore -= 0.2
+        }
+        
+        if nameTokens.count < 2 {
+            confidenceScore -= 0.3
+        }
+        
+        confidenceScore = max(0.0, min(1.0, confidenceScore))
+        
+        return PriceTagData(
+            productName: name.isEmpty ? "Unknown Product" : name,
+            price: priceDecimal,
+            brand: brand,
+            rawOCRText: ocrText,
+            confidenceScore: confidenceScore
+        )
+    }
+    
+    // MARK: - Parsing Helpers
+    
+    private func extractBrand(from lines: [String]) -> String? {
+        let trLocale = Locale(identifier: "tr-TR")
+        for line in lines {
+            let words = line.components(separatedBy: .whitespaces)
+            guard let firstWord = words.first else { continue }
+            
+            let upperFirstWord = firstWord.uppercased(with: trLocale)
+            
+            if validUnits.contains(upperFirstWord) || invalidBrands.contains(upperFirstWord) { continue }
+            
+            if let normalized = brandNormalizations[upperFirstWord] {
+                return normalized
+            }
+            
+            if firstWord == upperFirstWord && firstWord.count > 2 && firstWord.rangeOfCharacter(from: CharacterSet.decimalDigits) == nil {
+                return firstWord
+            }
+        }
+        return nil
+    }
+    
+    private func extractNameAndSize(from lines: [String], brand: String?) -> ([String], Double?) {
+        var nameTokens = [String]()
+        var sizeInKg: Double? = nil
+        
+        let trLocale = Locale(identifier: "tr-TR")
+        let priceRegex = try? NSRegularExpression(pattern: #"(\d+[,.]\d{1,2})\s*(?:TL|₺)?|(\d+)\s*(?:TL|₺)"#, options: .caseInsensitive)
+        let dateRegex = try? NSRegularExpression(pattern: #"\d{2}[./-]\d{2}[./-]\d{2,4}"#, options: [])
+        let timeRegex = try? NSRegularExpression(pattern: #"\d{2}:\d{2}(:\d{2})?"#, options: [])
+        
+        let trashWords = ["DAHIL", "DAHİL", "PAYLAS", "PAYLAŞ", "ZIYARET", "ŞIKAYETVAR", "ŞİKAYETVAR", "TIKTOK", "ARAMAK", "ARA", "GOOGLE", "TARINI", "TARIHI", "TARİHİ", "X", "YERLİ", "YERLI", "ÜRETİM", "URETIM", "URETİM", "ÜRETIM", "ADET", "YURTBAŞI", "ELAZIG", "ELAZIĞ"]
+        
+        var skipNextLine = false
+        
+        for line in lines {
+            if skipNextLine {
+                skipNextLine = false
+                continue
+            }
+            
+            let upperLine = line.uppercased(with: trLocale)
+            
+            // Fast fail lines: Skip if they contain tax, unit prices, or percentages
+            if upperLine.contains("KDV") || upperLine.contains("%") || upperLine.contains("/ KG") || upperLine.contains("/KG") || upperLine.contains("/ ADET") || upperLine.contains("/ADET") || upperLine.contains("1KG") || upperLine.contains("1LT") || upperLine.contains("FIYAT") || upperLine.contains("FİYAT") {
+                continue
+            }
+            
+            // Metadata Trigger: Skip this line and the immediate next line (which usually contains the value like 'Ukrayna')
+            if upperLine.contains("Ü.YER") || upperLine.contains("MENŞE") || upperLine.contains("TARİH") || upperLine.contains("TETT") || upperLine.contains("SKT") || upperLine.contains("PNT") {
+                skipNextLine = true
+                continue
+            }
+            
+            var cleanLine = line
+            // Strip dates and times completely so they are never parsed as words
+            if let dRegex = dateRegex {
+                cleanLine = dRegex.stringByReplacingMatches(in: cleanLine, options: [], range: NSRange(location: 0, length: cleanLine.utf16.count), withTemplate: " ")
+            }
+            if let tRegex = timeRegex {
+                cleanLine = tRegex.stringByReplacingMatches(in: cleanLine, options: [], range: NSRange(location: 0, length: cleanLine.utf16.count), withTemplate: " ")
+            }
+            if let pRegex = priceRegex {
+                cleanLine = pRegex.stringByReplacingMatches(in: cleanLine, options: [], range: NSRange(location: 0, length: cleanLine.utf16.count), withTemplate: " ")
+            }
+            
+            let tokens = cleanLine.components(separatedBy: .whitespaces)
+            
+            for (index, rawToken) in tokens.enumerated() {
+                let token = rawToken.trimmingCharacters(in: .punctuationCharacters)
+                if token.isEmpty { continue }
+                
+                let upperToken = token.uppercased(with: trLocale)
+                if upperToken == brand?.uppercased(with: trLocale) { continue }
+                
+                let hasLetters = token.rangeOfCharacter(from: CharacterSet.letters) != nil
+                let hasDigits = token.rangeOfCharacter(from: CharacterSet.decimalDigits) != nil
+                
+                if hasLetters && !hasDigits {
+                    // PURE WORD
+                    if token.count == 1 && !validUnits.contains(upperToken) { continue } // Drop random single letters
+                    if trashWords.contains(upperToken) { continue }
+                    if validUnits.contains(upperToken) {
+                        // Only add isolated unit if it follows a number
+                        if index > 0, tokens[index-1].rangeOfCharacter(from: CharacterSet.decimalDigits) != nil {
+                            if !nameTokens.contains(upperToken) { nameTokens.append(upperToken) }
+                        }
+                        continue
+                    }
+                    
+                    if !nameTokens.contains(upperToken) {
+                        nameTokens.append(upperToken)
+                    }
+                    
+                } else if hasDigits && !hasLetters {
+                    // PURE NUMBER
+                    // Keep ONLY if it acts as a size modifier for the next token (e.g. '80' then 'G')
+                    if index + 1 < tokens.count {
+                        let nextToken = tokens[index + 1].trimmingCharacters(in: .punctuationCharacters).uppercased(with: trLocale)
+                        if validUnits.contains(nextToken) {
+                            nameTokens.append(token)
+                            if let val = Double(token.replacingOccurrences(of: ",", with: ".")) {
+                                sizeInKg = (nextToken == "G" || nextToken == "GR" || nextToken == "ML" || nextToken == "CC") ? (val / 1000.0) : val
+                            }
+                        }
+                    }
+                } else if hasLetters && hasDigits {
+                    // MIXED ALPHANUMERIC
+                    
+                    // Check for multipack multiplier like 6X250 or 4X1L
+                    let multiplierRegex = try? NSRegularExpression(pattern: #"^\d+[X*x]\d+([A-Z]*)$"#, options: .caseInsensitive)
+                    if let mRegex = multiplierRegex, mRegex.firstMatch(in: upperToken, options: [], range: NSRange(location: 0, length: upperToken.utf16.count)) != nil {
+                        nameTokens.append(upperToken)
+                        continue
+                    }
+                    
+                    // Check for cleanly joined size like 80G or 1LT
+                    let letters = token.components(separatedBy: CharacterSet.letters.inverted).joined().uppercased(with: trLocale)
+                    let digits = token.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
+                    
+                    if token.hasPrefix(digits) && token.hasSuffix(letters) && validUnits.contains(letters) {
+                        nameTokens.append(upperToken)
+                        if let val = Double(digits) {
+                            sizeInKg = (letters == "G" || letters == "GR" || letters == "ML" || letters == "CC") ? (val / 1000.0) : val
+                        }
+                    }
+                }
+            }
+        }
+        
+        return (nameTokens, sizeInKg)
+    }
+    
+    private func extractPrice(from lines: [String], sizeInKg: Double?) -> (Decimal, Bool) {
+        var foundPrices = [Decimal]()
+        let priceRegex = try? NSRegularExpression(pattern: #"(\d+[,.]\d{1,2})\s*(?:TL|₺)?|(\d+)\s*(?:TL|₺)"#, options: .caseInsensitive)
+        let dateRegex = try? NSRegularExpression(pattern: #"\d{2}[./-]\d{2}[./-]\d{2,4}"#, options: [])
+        let timeRegex = try? NSRegularExpression(pattern: #"\d{2}:\d{2}(:\d{2})?"#, options: [])
+        
+        for line in lines {
+            // Strip dates and times BEFORE running price extraction to avoid matching "01.08.2023" as "1.08"
+            var cleanLine = line
+            if let dRegex = dateRegex {
+                cleanLine = dRegex.stringByReplacingMatches(in: cleanLine, options: [], range: NSRange(location: 0, length: cleanLine.utf16.count), withTemplate: " ")
+            }
+            if let tRegex = timeRegex {
+                cleanLine = tRegex.stringByReplacingMatches(in: cleanLine, options: [], range: NSRange(location: 0, length: cleanLine.utf16.count), withTemplate: " ")
+            }
+            
+            // Ignore strict unit price lines entirely
+            let upperLine = cleanLine.uppercased(with: Locale(identifier: "tr-TR"))
+            if upperLine.contains("/ KG") || upperLine.contains("/KG") || upperLine.contains("/ ADET") || upperLine.contains("/ADET") {
+                continue
+            }
+            
+            if let pRegex = priceRegex {
+                let matches = pRegex.matches(in: cleanLine, options: [], range: NSRange(location: 0, length: cleanLine.utf16.count))
+                for match in matches {
+                    var matchRange = match.range(at: 1)
+                    if matchRange.location == NSNotFound {
+                        matchRange = match.range(at: 2) 
+                    }
+                    
+                    if matchRange.location != NSNotFound, let r = Range(matchRange, in: cleanLine) {
+                        let priceStr = String(cleanLine[r]).replacingOccurrences(of: ",", with: ".")
+                        if let decimal = Decimal(string: priceStr) {
+                            // Safely reject common date components that slipped through or tiny artifacts
+                            if decimal > Decimal(0.0) && decimal < Decimal(100000) {
+                                foundPrices.append(decimal)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        if foundPrices.isEmpty { return (0, false) }
+        
+        let uniquePrices = Array(Set(foundPrices)).sorted()
+        if uniquePrices.count == 1 { return (uniquePrices[0], false) }
+        
+        // Mathematical Verification: P1 (Unit Price) * Size = P2 (Selling Price)
+        if let size = sizeInKg, size > 0 {
+            let sizeDec = Decimal(size)
+            for p1 in uniquePrices {
+                for p2 in uniquePrices {
+                    if p1 == p2 { continue }
+                    
+                    let calculatedP2 = p1 * sizeDec
+                    let diff = abs(calculatedP2 - p2)
+                    
+                    if diff <= Decimal(0.1) {
+                        return (p2, false) // Verified selling price
+                    }
+                }
+            }
+        }
+        
+        // Fallback for Discounts
+        let minPrice = uniquePrices.min() ?? 0
+        return (minPrice, true)
+    }
+}

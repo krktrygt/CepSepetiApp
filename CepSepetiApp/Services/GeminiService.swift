@@ -103,7 +103,8 @@ final class GeminiService {
             parsedData = PriceTagData(productName: parsedData.productName,
                                         price: parsedData.price,
                                         brand: parsedData.brand,
-                                        rawOCRText: ocrText)
+                                        rawOCRText: ocrText,
+                                        confidenceScore: 1.0) // AI parsing implies high confidence if successful
             return parsedData
                    
         } catch {

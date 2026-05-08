@@ -15,6 +15,10 @@ final class ImageProcessingPipeline {
     
     private let ocrService = OCRService()
     private let geminiService = GeminiService()
+    private let localParserService = LocalOCRParserService()
+    
+    // Threshold below which we fallback to Gemini
+    private let confidenceThreshold: Double = 0.7
     
     /// Processes an image: checks connectivity, performs OCR, and analyzes results with Gemini AI.
     /// Bir görüntüyü işler: bağlantıyı kontrol eder, OCR gerçekleştirir ve sonuçları Gemini AI ile analiz eder.
@@ -22,21 +26,46 @@ final class ImageProcessingPipeline {
     /// - Returns: An OCRResult indicating success with data or failure with an error.
     func process(image: UIImage) async -> OCRResult {
         
-        // Step 1: Check for internet connection as AI analysis requires it.
-        // Adım 1: Yapay zeka analizi gerektirdiği için internet bağlantısını kontrol et.
-        let isConnected = await checkConnection()
-        guard isConnected else {
-            return .failure(.networkUnavailable)
-        }
-        
         do {
-            // Step 2: Extract text using local Vision framework OCR.
-            // Adım 2: Yerel Vision çerçevesi OCR'ını kullanarak metni çıkar.
+            // Step 1: Extract text using local Vision framework OCR.
+            // Adım 1: Yerel Vision çerçevesi OCR'ını kullanarak metni çıkar.
             let ocrText = try await ocrService.recognizeText(from: image)
             
-            // Step 3: Send extracted text to Gemini AI for semantic analysis.
-            // Adım 3: Çıkarılan metni anlamsal analiz için Gemini AI'ya gönder.
+            print("\n📝 --- RAW OCR TEXT ---")
+            print(ocrText)
+            print("------------------------\n")
+            
+            // Step 2: Use Local Parser as primary extractor
+            // Adım 2: Yerel Ayrıştırıcıyı birincil çıkarıcı olarak kullan
+            let localResult = localParserService.parse(ocrText: ocrText)
+            let confidence = localResult.confidenceScore ?? 0.0
+            
+            print("🔍 Local Parser Confidence: \(confidence)")
+            
+            if confidence >= confidenceThreshold {
+                print("✅ Using Local Parser Result:")
+                print("   Product: \(localResult.productName)")
+                print("   Brand: \(localResult.brand ?? "None")")
+                print("   Price: \(localResult.price)\n")
+                return .success(localResult)
+            }
+            
+            // Step 3: Fallback to Gemini if local confidence is low
+            // Adım 3: Yerel güven düşükse Gemini'ye geri dön (fallback)
+            let isConnected = await checkConnection()
+            guard isConnected else {
+                // Even with low confidence, returning local result is better than failing completely without network
+                print("⚠️ Low confidence (\(confidence)), but no network. Using Local Result.")
+                return .success(localResult)
+            }
+            
+            print("☁️ Falling back to Gemini AI due to low confidence...")
             let parsedResult = try await geminiService.parse(ocrText: ocrText)
+            
+            print("✅ Using Gemini AI Result:")
+            print("   Product: \(parsedResult.productName)")
+            print("   Brand: \(parsedResult.brand ?? "None")")
+            print("   Price: \(parsedResult.price)\n")
             
             return .success(parsedResult)
             

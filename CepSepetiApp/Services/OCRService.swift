@@ -18,9 +18,14 @@ final class OCRService {
     /// - Parameter image: The source UIImage.
     /// - Returns: A single string containing all recognized text separated by newlines.
     func recognizeText(from image: UIImage) async throws -> String {
-        guard let cgImage = image.cgImage else {
+        // Step 1: Physically crop the image to the central square to eliminate outside noise
+        // Adım 1: Dışarıdaki gürültüyü ortadan kaldırmak için görüntüyü fiziksel olarak ortadaki kareye kırpın
+        guard let croppedImage = cropToCenter(image: image),
+              let cgImage = croppedImage.cgImage else {
             throw OCRError.parsingFailed
         }
+        
+        let orientation = cgImageOrientation(from: croppedImage.imageOrientation)
         
         // Execute the processing in a detached task to keep the main thread free and comply with concurrency rules.
         // Ana iş parçacığını serbest tutmak ve eşzamanlılık kurallarına uymak için işlemi bağımsız (detached) bir görevde yürütün.
@@ -66,7 +71,9 @@ final class OCRService {
                 // Marketle ilgili terimlerin tanınmasını iyileştirmek için özel anahtar kelimeler.
                 request.customWords = ["TL", "₺", "KDV", "Fiyatı", "Adet", "İndirim", "kg", "lt", "ml"]
                 
-                let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+                // We pass the exact orientation so Vision reads the text upright.
+                // Vision'ın metni dik okuması için tam yönü iletiyoruz.
+                let handler = VNImageRequestHandler(cgImage: cgImage, orientation: orientation, options: [:])
                 
                 do {
                     try handler.perform([request])
@@ -75,6 +82,48 @@ final class OCRService {
                 }
             }
         }.value
+    }
+    
+    // MARK: - Helpers
+    
+    /// Physically crops a UIImage to a central square corresponding to the visual UI cutout.
+    /// UIImage'i, UI'daki görsel kesite karşılık gelen ortadaki bir kareye fiziksel olarak kırpar.
+    private func cropToCenter(image: UIImage) -> UIImage? {
+        guard let cgImage = image.cgImage else { return nil }
+        
+        let width = CGFloat(cgImage.width)
+        let height = CGFloat(cgImage.height)
+        
+        // The visual cutout is 70% of screen width. Because of aspectFill camera zoom, 
+        // a tighter crop (around 40% of the shortest side) maps accurately to that UI square.
+        // Görsel kesit ekran genişliğinin %70'idir. AspectFill kamera yakınlaştırması nedeniyle,
+        // daha dar bir kırpma (kısa kenarın yaklaşık %40'ı) UI karesiyle tam olarak eşleşir.
+        let cropSize = min(width, height) * 0.4
+        
+        let x = (width - cropSize) / 2.0
+        let y = (height - cropSize) / 2.0
+        let cropRect = CGRect(x: x, y: y, width: cropSize, height: cropSize)
+        
+        if let croppedCgImage = cgImage.cropping(to: cropRect) {
+            return UIImage(cgImage: croppedCgImage, scale: image.scale, orientation: image.imageOrientation)
+        }
+        return nil
+    }
+    
+    /// Maps UIImage.Orientation to CGImagePropertyOrientation required by Vision.
+    /// UIImage.Orientation'ı Vision tarafından istenen CGImagePropertyOrientation'a eşler.
+    private func cgImageOrientation(from uiOrientation: UIImage.Orientation) -> CGImagePropertyOrientation {
+        switch uiOrientation {
+        case .up: return .up
+        case .down: return .down
+        case .left: return .left
+        case .right: return .right
+        case .upMirrored: return .upMirrored
+        case .downMirrored: return .downMirrored
+        case .leftMirrored: return .leftMirrored
+        case .rightMirrored: return .rightMirrored
+        @unknown default: return .up
+        }
     }
 }
 
