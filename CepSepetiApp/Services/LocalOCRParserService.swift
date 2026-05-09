@@ -11,6 +11,10 @@ import Foundation
 /// Bu servis, ham OCR metninden ürün bilgilerini çıkarmak için tamamen yerel Swift tabanlı ayrıştırıcıdır.
 final class LocalOCRParserService {
     
+    private let priceRegex = try! NSRegularExpression(pattern: #"(\d+[,.]\d{1,2})\s*(?:TL|₺)?|(\d+)\s*(?:TL|₺)"#, options: .caseInsensitive)
+    private let dateRegex = try! NSRegularExpression(pattern: #"\d{2}[./-]\d{2}[./-]\d{2,4}"#, options: [])
+    private let timeRegex = try! NSRegularExpression(pattern: #"\d{2}:\d{2}(:\d{2})?"#, options: [])
+
     // Known unit keywords to classify sizes
     private let validUnits = ["G", "GR", "KG", "L", "LT", "LITRE", "LİTRE", "ML", "CC", "ADET", "PAKET"]
     
@@ -107,9 +111,6 @@ final class LocalOCRParserService {
         var sizeInKg: Double? = nil
         
         let trLocale = Locale(identifier: "tr-TR")
-        let priceRegex = try? NSRegularExpression(pattern: #"(\d+[,.]\d{1,2})\s*(?:TL|₺)?|(\d+)\s*(?:TL|₺)"#, options: .caseInsensitive)
-        let dateRegex = try? NSRegularExpression(pattern: #"\d{2}[./-]\d{2}[./-]\d{2,4}"#, options: [])
-        let timeRegex = try? NSRegularExpression(pattern: #"\d{2}:\d{2}(:\d{2})?"#, options: [])
         
         let trashWords = ["DAHIL", "DAHİL", "PAYLAS", "PAYLAŞ", "ZIYARET", "ŞIKAYETVAR", "ŞİKAYETVAR", "TIKTOK", "ARAMAK", "ARA", "GOOGLE", "TARINI", "TARIHI", "TARİHİ", "X", "YERLİ", "YERLI", "ÜRETİM", "URETIM", "URETİM", "ÜRETIM", "ADET", "YURTBAŞI", "ELAZIG", "ELAZIĞ"]
         
@@ -136,15 +137,9 @@ final class LocalOCRParserService {
             
             var cleanLine = line
             // Strip dates and times completely so they are never parsed as words
-            if let dRegex = dateRegex {
-                cleanLine = dRegex.stringByReplacingMatches(in: cleanLine, options: [], range: NSRange(location: 0, length: cleanLine.utf16.count), withTemplate: " ")
-            }
-            if let tRegex = timeRegex {
-                cleanLine = tRegex.stringByReplacingMatches(in: cleanLine, options: [], range: NSRange(location: 0, length: cleanLine.utf16.count), withTemplate: " ")
-            }
-            if let pRegex = priceRegex {
-                cleanLine = pRegex.stringByReplacingMatches(in: cleanLine, options: [], range: NSRange(location: 0, length: cleanLine.utf16.count), withTemplate: " ")
-            }
+            cleanLine = dateRegex.stringByReplacingMatches(in: cleanLine, options: [], range: NSRange(location: 0, length: cleanLine.utf16.count), withTemplate: " ")
+            cleanLine = timeRegex.stringByReplacingMatches(in: cleanLine, options: [], range: NSRange(location: 0, length: cleanLine.utf16.count), withTemplate: " ")
+            cleanLine = priceRegex.stringByReplacingMatches(in: cleanLine, options: [], range: NSRange(location: 0, length: cleanLine.utf16.count), withTemplate: " ")
             
             let tokens = cleanLine.components(separatedBy: .whitespaces)
             
@@ -215,19 +210,12 @@ final class LocalOCRParserService {
     
     private func extractPrice(from lines: [String], sizeInKg: Double?) -> (Decimal, Bool) {
         var foundPrices = [Decimal]()
-        let priceRegex = try? NSRegularExpression(pattern: #"(\d+[,.]\d{1,2})\s*(?:TL|₺)?|(\d+)\s*(?:TL|₺)"#, options: .caseInsensitive)
-        let dateRegex = try? NSRegularExpression(pattern: #"\d{2}[./-]\d{2}[./-]\d{2,4}"#, options: [])
-        let timeRegex = try? NSRegularExpression(pattern: #"\d{2}:\d{2}(:\d{2})?"#, options: [])
         
         for line in lines {
             // Strip dates and times BEFORE running price extraction to avoid matching "01.08.2023" as "1.08"
             var cleanLine = line
-            if let dRegex = dateRegex {
-                cleanLine = dRegex.stringByReplacingMatches(in: cleanLine, options: [], range: NSRange(location: 0, length: cleanLine.utf16.count), withTemplate: " ")
-            }
-            if let tRegex = timeRegex {
-                cleanLine = tRegex.stringByReplacingMatches(in: cleanLine, options: [], range: NSRange(location: 0, length: cleanLine.utf16.count), withTemplate: " ")
-            }
+            cleanLine = dateRegex.stringByReplacingMatches(in: cleanLine, options: [], range: NSRange(location: 0, length: cleanLine.utf16.count), withTemplate: " ")
+            cleanLine = timeRegex.stringByReplacingMatches(in: cleanLine, options: [], range: NSRange(location: 0, length: cleanLine.utf16.count), withTemplate: " ")
             
             // Ignore strict unit price lines entirely
             let upperLine = cleanLine.uppercased(with: Locale(identifier: "tr-TR"))
@@ -235,21 +223,19 @@ final class LocalOCRParserService {
                 continue
             }
             
-            if let pRegex = priceRegex {
-                let matches = pRegex.matches(in: cleanLine, options: [], range: NSRange(location: 0, length: cleanLine.utf16.count))
-                for match in matches {
-                    var matchRange = match.range(at: 1)
-                    if matchRange.location == NSNotFound {
-                        matchRange = match.range(at: 2) 
-                    }
-                    
-                    if matchRange.location != NSNotFound, let r = Range(matchRange, in: cleanLine) {
-                        let priceStr = String(cleanLine[r]).replacingOccurrences(of: ",", with: ".")
-                        if let decimal = Decimal(string: priceStr) {
-                            // Safely reject common date components that slipped through or tiny artifacts
-                            if decimal > Decimal(0.0) && decimal < Decimal(100000) {
-                                foundPrices.append(decimal)
-                            }
+            let matches = priceRegex.matches(in: cleanLine, options: [], range: NSRange(location: 0, length: cleanLine.utf16.count))
+            for match in matches {
+                var matchRange = match.range(at: 1)
+                if matchRange.location == NSNotFound {
+                    matchRange = match.range(at: 2) 
+                }
+                
+                if matchRange.location != NSNotFound, let r = Range(matchRange, in: cleanLine) {
+                    let priceStr = String(cleanLine[r]).replacingOccurrences(of: ",", with: ".")
+                    if let decimal = Decimal(string: priceStr) {
+                        // Safely reject common date components that slipped through or tiny artifacts
+                        if decimal > Decimal(0.0) && decimal < Decimal(100000) {
+                            foundPrices.append(decimal)
                         }
                     }
                 }
