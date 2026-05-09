@@ -35,16 +35,16 @@ struct AddProductView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section(header: Text("Product Details (Editable)")) {
-                    TextField("Product Name", text: $editedName)
+                Section(header: Text("Ürün Detayları (Düzenlenebilir)")) {
+                    TextField("Ürün Adı", text: $editedName)
                     
-                    TextField("Price (₺)", value: $editedPrice, format: .number)
+                    TextField("Fiyat (₺)", value: $editedPrice, format: .number)
                         .keyboardType(.decimalPad)
                     
-                    TextField("Quantity", value: $quantity, format: .number)
+                    TextField("Adet", value: $quantity, format: .number)
                         .keyboardType(.numberPad)
                     
-                    Picker("Category", selection: $selectedCategory) {
+                    Picker("Kategori", selection: $selectedCategory) {
                         ForEach(categories, id: \.self) {
                             Text($0)
                         }
@@ -54,9 +54,9 @@ struct AddProductView: View {
                 // Display identified brand if Gemini AI found it.
                 // Gemini AI markayı bulduysa tanımlanan markayı gösterin.
                 if let brand = viewModel.ocrResult?.brand {
-                    Section(header: Text("Extra Information")) {
+                    Section(header: Text("Ek Bilgiler")) {
                         HStack {
-                            Text("Brand")
+                            Text("Marka")
                             Spacer()
                             Text(brand).foregroundColor(.gray)
                         }
@@ -77,7 +77,7 @@ struct AddProductView: View {
                         )
                         dismiss() 
                     }) {
-                        Text("Add to Cart")
+                        Text("Sepete Ekle")
                             .font(.headline)
                             .frame(maxWidth: .infinity)
                             .foregroundColor(.white)
@@ -85,11 +85,11 @@ struct AddProductView: View {
                     .listRowBackground(Color.blue)
                 }
             }
-            .navigationTitle("Confirm Product")
+            .navigationTitle("Ürünü Onayla")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
+                    Button("Vazgeç") {
                         viewModel.showConfirmation = false
                         viewModel.ocrResult = nil
                         dismiss()

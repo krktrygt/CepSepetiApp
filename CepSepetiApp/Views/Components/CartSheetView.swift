@@ -50,13 +50,13 @@ struct CartSheetView: View {
                                 // Öğe miktarını ayarlamak için Stepper
                                 Stepper("", value: $item.quantity, in: 1...100)
                                     .labelsHidden()
-                                Text("\(item.quantity) Units")
+                                Text("\(item.quantity) Adet")
                                     .frame(width: 60, alignment: .trailing)
                             }
                         }
                         .onDelete(perform: deleteItems)
                     } else {
-                        Text("Your cart is currently empty.")
+                        Text("Sepetiniz şu anda boş.")
                             .foregroundColor(.gray)
                     }
                 }
@@ -65,7 +65,7 @@ struct CartSheetView: View {
                 // Toplam tutar ve ödeme butonu ile özet bölümü
                 VStack(spacing: 16) {
                     HStack {
-                        Text("Total Amount:")
+                        Text("Toplam Tutar:")
                             .font(.title2)
                         Spacer()
                         Text(totalAmount, format: .currency(code: "TRY"))
@@ -82,7 +82,7 @@ struct CartSheetView: View {
                         
                         dismiss()
                     }) {
-                        Text("Finish Shopping")
+                        Text("Alışverişi Bitir")
                             .font(.headline)
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
@@ -95,11 +95,11 @@ struct CartSheetView: View {
                 }
                 .padding(.bottom)
             }
-            .navigationTitle("My Cart")
+            .navigationTitle("Sepetim")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Close") { dismiss() }
+                    Button("Kapat") { dismiss() }
                 }
             }
         }

@@ -41,13 +41,13 @@ enum OCRError: Error, LocalizedError {
     var errorDescription: String? {
         switch self {
         case .noTextFound:
-            return "No readable text found on the label. Please try from a closer distance."
+            return "Etikette okunabilir metin bulunamadı. Lütfen daha yakından tekrar deneyin."
         case .networkUnavailable:
-            return "Internet connection could not be established. Connection is required for price analysis."
+            return "İnternet bağlantısı kurulamadı. Fiyat analizi için bağlantı gereklidir."
         case .geminiError(let message):
-            return "An error occurred during AI analysis: \(message)"
+            return "Yapay zeka analizi sırasında bir hata oluştu: \(message)"
         case .parsingFailed:
-            return "The read data could not be converted into meaningful price information."
+            return "Okunan veriler anlamlı bir fiyat bilgisine dönüştürülemedi."
         }
     }
 }

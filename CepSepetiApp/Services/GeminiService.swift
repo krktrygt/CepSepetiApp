@@ -77,12 +77,12 @@ final class GeminiService {
             print("📡 HTTP Status Code: \(httpResponse.statusCode)")
             
             if httpResponse.statusCode != 200 {
-                let serverErrorMessage = String(data: data, encoding: .utf8) ?? "Message not readable"
+                let serverErrorMessage = String(data: data, encoding: .utf8) ?? "Mesaj okunamadı"
                 print("🚨 GOOGLE API ERROR DETAIL:\n\(serverErrorMessage)")
-                throw OCRError.geminiError("Server Error. Code: \(httpResponse.statusCode)")
+                throw OCRError.geminiError("Sunucu Hatası. Kod: \(httpResponse.statusCode)")
             }
         } else {
-            throw OCRError.geminiError("Invalid server response.")
+            throw OCRError.geminiError("Geçersiz sunucu yanıtı.")
         }
 
         // Parse the hierarchical JSON response from Gemini into PriceTagData.
@@ -108,7 +108,7 @@ final class GeminiService {
             return parsedData
                    
         } catch {
-            throw OCRError.geminiError("Incoming data could not be understood.")
+            throw OCRError.geminiError("Gelen veriler anlaşılamadı.")
         }
     }
 }

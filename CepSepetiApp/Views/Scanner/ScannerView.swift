@@ -124,7 +124,7 @@ struct ScannerView: View {
                                 .scaleEffect(1.5)
                                 .tint(.white)
                             
-                            Text("AI is analyzing the price tag...")
+                            Text("Yapay zeka fiyat etiketini analiz ediyor...")
                                 .font(.headline)
                                 .foregroundColor(.white)
                         }
@@ -140,11 +140,11 @@ struct ScannerView: View {
             }
             // Show alert on processing failure
             // İşleme hatasında uyarı gösterin
-            .alert("Analysis Error", isPresented: Binding(
+            .alert("Analiz Hatası", isPresented: Binding(
                 get: { viewModel.errorMessage != nil },
                 set: { if !$0 { viewModel.errorMessage = nil } }
             )) {
-                Button("OK", role: .cancel) { }
+                Button("Tamam", role: .cancel) { }
             } message: {
                 if let message = viewModel.errorMessage {
                     Text(message)

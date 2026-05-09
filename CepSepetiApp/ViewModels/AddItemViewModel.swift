@@ -69,7 +69,7 @@ final class AddItemViewModel {
                     self.errorMessage = error.localizedDescription
                 }
             } catch {
-                self.errorMessage = "Camera error: Could not capture photo."
+                self.errorMessage = "Kamera hatası: Fotoğraf çekilemedi."
             }
             self.isProcessing = false
         }

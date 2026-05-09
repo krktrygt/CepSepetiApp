@@ -25,9 +25,9 @@ struct HomeView: View {
         NavigationStack {
             VStack {
                 List {
-                    Section(header: Text("Past Shopping Trips")) {
+                    Section(header: Text("Geçmiş Alışverişler")) {
                         if sessions.isEmpty {
-                            Text("No completed shopping trips yet.")
+                            Text("Henüz tamamlanmış bir alışveriş yok.")
                                 .foregroundColor(.gray)
                                 .font(.callout)
                         } else {
@@ -36,7 +36,7 @@ struct HomeView: View {
                                     VStack(alignment: .leading) {
                                         Text(session.date, format: .dateTime.day().month().year())
                                             .font(.headline)
-                                        Text("\(session.items?.count ?? 0) Items")
+                                        Text("\(session.items?.count ?? 0) Ürün")
                                             .font(.caption)
                                             .foregroundColor(.gray)
                                     }
@@ -65,7 +65,7 @@ struct HomeView: View {
                 }) {
                     HStack {
                         Image(systemName: "cart.badge.plus")
-                        Text("Start New Shopping Trip")
+                        Text("Yeni Alışveriş Başlat")
                     }
                     .font(.headline)
                     .foregroundColor(.white)
