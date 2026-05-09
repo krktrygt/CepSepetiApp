@@ -12,6 +12,7 @@ import SwiftData
 /// Fiyat etiketlerini taramak için birincil kamera arayüzü. Kaplamalar (overlays) sağlar ve OCR analizini tetikler.
 struct ScannerView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var context
     
     /// Manages the state and logic for capturing and processing images.
     /// Görüntüleri yakalama ve işleme durumunu ve mantığını yönetir.
@@ -27,6 +28,24 @@ struct ScannerView: View {
     /// Controls the device flashlight state.
     /// Cihaz feneri durumunu kontrol eder.
     @State private var isFlashOn = false
+    
+    /// Flag to show the cancellation confirmation alert.
+    /// İptal onay uyarısını göstermek için bayrak.
+    @State private var showCancelAlert = false
+    
+    /// Action to cancel the shopping session and cleanup items.
+    /// Alışveriş oturumunu iptal etme ve öğeleri temizleme eylemi.
+    private func cancelShopping() {
+        if let items = activeSession.items {
+            for item in items {
+                context.delete(item)
+            }
+        }
+        context.delete(activeSession)
+        try? context.save()
+        viewModel.cameraService.stop()
+        dismiss()
+    }
     
     var body: some View {
         NavigationStack {
@@ -49,27 +68,11 @@ struct ScannerView: View {
                             viewModel.cameraService.stop()
                             dismiss()
                         }) {
-                            Image(systemName: "xmark.circle.fill")
+                            Image(systemName: "chevron.left.circle.fill")
                                 .font(.system(size: 30))
                                 .foregroundColor(.white)
                                 .padding()
                         }
-                        
-                        Spacer()
-                        
-                        // Cart button to review current session items
-                        // Mevcut oturum öğelerini incelemek için sepet butonu
-                        Button(action: {
-                            showCart = true
-                        }) {
-                            Image(systemName: "cart.fill")
-                                .font(.system(size: 25))
-                                .foregroundColor(.white)
-                                .padding()
-                                .background(Color.black.opacity(0.5))
-                                .clipShape(Circle())
-                        }
-                        .padding(.trailing, 20)
                         
                         Spacer()
                         
@@ -92,24 +95,65 @@ struct ScannerView: View {
                     
                     Spacer()
                     
-                    // Capture button to take a photo and start OCR analysis
-                    // Fotoğraf çekmek ve OCR analizini başlatmak için yakalama butonu
-                    Button(action: {
-                        viewModel.captureAndProcess()
-                    }) {
-                        Circle()
-                            .fill(Color.white)
-                            .frame(width: 80, height: 80)
-                            .overlay(
-                                Circle()
-                                    .stroke(Color.gray, lineWidth: 2)
-                                    .frame(width: 70, height: 70)
-                            )
-                            .shadow(radius: 10)
+                    HStack(spacing: 30) {
+                        // Cancel Shopping Button (Moved to bottom left)
+                        // Alışverişi İptal Et Butonu (Sol alta taşındı)
+                        Button(action: {
+                            showCancelAlert = true
+                        }) {
+                            Image(systemName: "trash.fill")
+                                .font(.system(size: 20))
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(Color.red.opacity(0.8))
+                                .clipShape(Circle())
+                        }
+                        .frame(width: 60, height: 60)
+                        
+                        // Capture button to take a photo and start OCR analysis
+                        // Fotoğraf çekmek ve OCR analizini başlatmak için yakalama butonu
+                        Button(action: {
+                            viewModel.captureAndProcess()
+                        }) {
+                            Circle()
+                                .fill(Color.white)
+                                .frame(width: 80, height: 80)
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.gray, lineWidth: 2)
+                                        .frame(width: 70, height: 70)
+                                )
+                                .shadow(radius: 10)
+                        }
+                        .disabled(viewModel.isProcessing)
+                        .opacity(viewModel.isProcessing ? 0.5 : 1.0)
+
+                        // Cart button with dynamic badge
+                        // Dinamik rozetli sepet butonu
+                        Button(action: {
+                            showCart = true
+                        }) {
+                            Image(systemName: "cart.fill")
+                                .font(.system(size: 25))
+                                .foregroundColor(.white)
+                                .padding()
+                                .background(Color.black.opacity(0.5))
+                                .clipShape(Circle())
+                                .overlay(alignment: .topTrailing) {
+                                    if let itemCount = activeSession.items?.count, itemCount > 0 {
+                                        Text("\(itemCount)")
+                                            .font(.caption2).bold()
+                                            .foregroundColor(.white)
+                                            .frame(width: 20, height: 20)
+                                            .background(Color.red)
+                                            .clipShape(Circle())
+                                            .offset(x: 5, y: -5)
+                                    }
+                                }
+                        }
+                        .frame(width: 60, height: 60)
                     }
                     .padding(.bottom, 50)
-                    .disabled(viewModel.isProcessing)
-                    .opacity(viewModel.isProcessing ? 0.5 : 1.0)
                 }
                 
                 // Layer 4: AI Analysis Loading Screen
@@ -136,6 +180,7 @@ struct ScannerView: View {
             .sheet(isPresented: $viewModel.showConfirmation) {
                 if viewModel.ocrResult != nil {
                     AddProductView(viewModel: viewModel, activeSession: activeSession)
+                        .presentationDetents([.fraction(0.85), .medium])
                 }
             }
             // Show alert on processing failure
@@ -159,6 +204,21 @@ struct ScannerView: View {
         }
         .sheet(isPresented: $showCart) {
             CartSheetView(activeSession: activeSession)
+                .presentationDetents([.medium, .large])
+        }
+        .onChange(of: activeSession.isCompleted) { _, newValue in
+            if newValue {
+                viewModel.cameraService.stop()
+                dismiss()
+            }
+        }
+        .alert("Alışverişi İptal Et", isPresented: $showCancelAlert) {
+            Button("Evet, İptal Et", role: .destructive) {
+                cancelShopping()
+            }
+            Button("Hayır", role: .cancel) { }
+        } message: {
+            Text("Bu alışverişi ve eklenen tüm ürünleri silmek istediğinize emin misiniz?")
         }
     }
 }

@@ -13,9 +13,9 @@ import SwiftData
 struct HomeView: View {
     @Environment(\.modelContext) private var context
     
-    /// Fetches only completed shopping sessions, sorted by date in descending order.
-    /// Yalnızca tamamlanmış alışveriş oturumlarını tarih sırasına göre azalan şekilde getirir.
-    @Query(filter: #Predicate<ShoppingSession> { $0.isCompleted }, sort: \ShoppingSession.date, order: .reverse) private var sessions: [ShoppingSession]
+    /// Fetches all shopping sessions.
+    /// Tüm alışveriş oturumlarını getirir.
+    @Query(sort: \ShoppingSession.date, order: .reverse) private var allSessions: [ShoppingSession]
     
     /// Holds the currently active shopping session if one is in progress.
     /// Devam eden bir tane varsa, o andaki aktif alışveriş oturumunu tutar.
@@ -25,13 +25,42 @@ struct HomeView: View {
         NavigationStack {
             VStack {
                 List {
+                    let activeSessions = allSessions.filter { !$0.isCompleted }
+                    let completedSessions = allSessions.filter { $0.isCompleted }
+                    
+                    if !activeSessions.isEmpty {
+                        Section(header: Text("Devam Eden Alışverişler")) {
+                            ForEach(activeSessions) { session in
+                                Button(action: {
+                                    self.currentSession = session
+                                }) {
+                                    HStack {
+                                        VStack(alignment: .leading) {
+                                            Text(session.date, format: .dateTime.day().month().year())
+                                                .font(.headline)
+                                            Text("\(session.items?.count ?? 0) Ürün")
+                                                .font(.caption)
+                                                .foregroundColor(.gray)
+                                        }
+                                        Spacer()
+                                        Image(systemName: "chevron.right")
+                                            .foregroundColor(.gray)
+                                    }
+                                }
+                            }
+                            .onDelete { offsets in
+                                deleteSession(from: activeSessions, at: offsets)
+                            }
+                        }
+                    }
+                    
                     Section(header: Text("Geçmiş Alışverişler")) {
-                        if sessions.isEmpty {
+                        if completedSessions.isEmpty {
                             Text("Henüz tamamlanmış bir alışveriş yok.")
                                 .foregroundColor(.gray)
                                 .font(.callout)
                         } else {
-                            ForEach(sessions) { session in
+                            ForEach(completedSessions) { session in
                                 HStack {
                                     VStack(alignment: .leading) {
                                         Text(session.date, format: .dateTime.day().month().year())
@@ -45,7 +74,9 @@ struct HomeView: View {
                                         .bold()
                                 }
                             }
-                            .onDelete(perform: deleteSession)
+                            .onDelete { offsets in
+                                deleteSession(from: completedSessions, at: offsets)
+                            }
                         }
                     }
                 }
@@ -84,12 +115,14 @@ struct HomeView: View {
         }
     }
     
-    /// Removes a completed session from history.
-    /// Tamamlanmış bir oturumu geçmişten kaldırır.
-    private func deleteSession(offsets: IndexSet) {
+    /// Removes a session from history.
+    /// Bir oturumu geçmişten kaldırır.
+    private func deleteSession(from filteredSessions: [ShoppingSession], at offsets: IndexSet) {
         for index in offsets {
-            context.delete(sessions[index])
+            let sessionToDelete = filteredSessions[index]
+            context.delete(sessionToDelete)
         }
+        try? context.save()
     }
 }
 

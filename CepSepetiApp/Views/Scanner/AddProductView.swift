@@ -41,8 +41,14 @@ struct AddProductView: View {
                     TextField("Fiyat (₺)", value: $editedPrice, format: .number)
                         .keyboardType(.decimalPad)
                     
-                    TextField("Adet", value: $quantity, format: .number)
-                        .keyboardType(.numberPad)
+                    Stepper(value: $quantity, in: 1...100) {
+                        HStack {
+                            Text("Adet")
+                            Spacer()
+                            Text("\(quantity)")
+                                .bold()
+                        }
+                    }
                     
                     Picker("Kategori", selection: $selectedCategory) {
                         ForEach(categories, id: \.self) {
@@ -62,28 +68,6 @@ struct AddProductView: View {
                         }
                     }
                 }
-                
-                Section {
-                    Button(action: {
-                        // Confirm and save the item via the ViewModel.
-                        // Öğeyi ViewModel aracılığıyla onaylayın ve kaydedin.
-                        viewModel.confirmItem(
-                            editedName: editedName,
-                            editedPrice: editedPrice,
-                            category: selectedCategory,
-                            quantity: quantity,
-                            activeSession: activeSession,
-                            context: context
-                        )
-                        dismiss() 
-                    }) {
-                        Text("Sepete Ekle")
-                            .font(.headline)
-                            .frame(maxWidth: .infinity)
-                            .foregroundColor(.white)
-                    }
-                    .listRowBackground(Color.blue)
-                }
             }
             .navigationTitle("Ürünü Onayla")
             .navigationBarTitleDisplayMode(.inline)
@@ -94,6 +78,24 @@ struct AddProductView: View {
                         viewModel.ocrResult = nil
                         dismiss()
                     }
+                    .foregroundColor(.red)
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Ekle") {
+                        // Confirm and save the item via the ViewModel.
+                        // Öğeyi ViewModel aracılığıyla onaylayın ve kaydedin.
+                        viewModel.confirmItem(
+                            editedName: editedName,
+                            editedPrice: editedPrice,
+                            category: selectedCategory,
+                            quantity: quantity,
+                            activeSession: activeSession,
+                            context: context
+                        )
+                        dismiss()
+                    }
+                    .bold()
+                    .foregroundColor(.green)
                 }
             }
             .onAppear {

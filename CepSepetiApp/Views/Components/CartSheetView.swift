@@ -79,6 +79,7 @@ struct CartSheetView: View {
                         // Oturumu tamamlandı olarak işaretleyin ve nihai toplamı kaydedin
                         activeSession.totalAmount = totalAmount
                         activeSession.isCompleted = true
+                        try? context.save()
                         
                         dismiss()
                     }) {
