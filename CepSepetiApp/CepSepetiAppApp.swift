@@ -14,7 +14,7 @@ import SwiftData
 struct CepSepetiAppApp: App {
     var body: some Scene {
         WindowGroup {
-            HomeView()
+            MainTabView()
         }
         // Initialize the SwiftData container for persisting sessions and items.
         // Oturumları ve öğeleri saklamak için SwiftData kapsayıcısını başlatın.
@@ -24,10 +24,10 @@ struct CepSepetiAppApp: App {
 
 /*
  SUMMARY:
- This is the application lifecycle controller. It sets up the root view (HomeView) 
+ This is the application lifecycle controller. It sets up the root view (MainTabView) 
  and configures the shared SwiftData model container used for persistence across the app.
  
  ÖZET:
- Bu, uygulama yaşam döngüsü kontrolörüdür. Kök görünümü (HomeView) ayarlar ve uygulama genelinde 
+ Bu, uygulama yaşam döngüsü kontrolörüdür. Kök görünümü (MainTabView) ayarlar ve uygulama genelinde 
  kalıcılık için kullanılan paylaşılan SwiftData model kapsayıcısını yapılandırır.
  */

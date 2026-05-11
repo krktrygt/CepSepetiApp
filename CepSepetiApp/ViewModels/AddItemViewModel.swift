@@ -80,18 +80,18 @@ final class AddItemViewModel {
     /// - Parameters:
     ///   - editedName: The name of the product (potentially edited by the user).
     ///   - editedPrice: The price of the product (potentially edited by the user).
-    ///   - category: The category assigned to the product.
+    //   - category: The category assigned to the product.
     ///   - quantity: The number of units being added.
     ///   - activeSession: The current shopping session.
     ///   - context: The ModelContext for SwiftData operations.
-    func confirmItem(editedName: String, editedPrice: Decimal, category: String, quantity: Int, activeSession: ShoppingSession, context: ModelContext) {
+    func confirmItem(editedName: String, editedPrice: Decimal, /* category: String, */ quantity: Int, activeSession: ShoppingSession, context: ModelContext) {
         
         // Create a new persistent ShoppingItem instance.
         // Yeni bir kalıcı ShoppingItem örneği oluşturun.
         let newItem = ShoppingItem(
             productName: editedName,
             price: editedPrice,
-            category: category,
+            // category: category,
             quantity: quantity,
             session: activeSession
         )

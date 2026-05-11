@@ -125,7 +125,7 @@ struct HomeView: View {
                 }
             }
             .navigationTitle("Harcamalarım")
-            .safeAreaInset(edge: .bottom) {
+            /*.safeAreaInset(edge: .bottom) {
                 // Button to initiate a new shopping trip, pinned to the bottom
                 // Yeni bir alışveriş gezisi başlatmak için alt kısma sabitlenmiş buton
                 Button(action: {
@@ -155,7 +155,7 @@ struct HomeView: View {
             }
             .fullScreenCover(item: $currentSession) { session in
                 ScannerView(activeSession: session)
-            }
+            }*/
         }
     }
     

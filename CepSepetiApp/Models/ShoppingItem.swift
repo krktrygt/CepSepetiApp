@@ -20,9 +20,11 @@ final class ShoppingItem {
     /// The unit price of the product.
     /// Ürünün birim fiyatı.
     var price: Decimal
+    /*
     /// The category the product belongs to (e.g., Beverage, Snacks).
     /// Ürünün ait olduğu kategori (örneğin, İçecek, Atıştırmalık).
     var category: String
+    */
     /// The quantity of this item in the cart.
     /// Sepetteki bu öğenin miktarı.
     var quantity: Int
@@ -39,14 +41,14 @@ final class ShoppingItem {
     ///   - productName: Name of the product.
     ///   - brand: Optional brand name.
     ///   - price: Price per unit.
-    ///   - category: Product category.
+    ///   // - category: Product category.
     ///   - quantity: Initial quantity.
     ///   - session: The parent shopping session.
-    init(productName: String, brand: String? = nil, price: Decimal, category: String, quantity: Int, session: ShoppingSession? = nil) {
+    init(productName: String, brand: String? = nil, price: Decimal, /* category: String, */ quantity: Int, session: ShoppingSession? = nil) {
         self.productName = productName
         self.brand = brand
         self.price = price
-        self.category = category
+        // self.category = category
         self.quantity = quantity
         self.createdAt = Date()
         self.session = session

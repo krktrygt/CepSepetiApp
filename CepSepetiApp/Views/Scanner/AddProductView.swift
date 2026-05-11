@@ -26,11 +26,11 @@ struct AddProductView: View {
     @State private var editedName: String = ""
     @State private var editedPrice: Decimal = 0.0
     @State private var quantity: Int = 1
-    @State private var selectedCategory: String = "Gıda"
+    // @State private var selectedCategory: String = "Gıda"
     
     /// List of available product categories.
     /// Mevcut ürün kategorilerinin listesi.
-    let categories = ["Gıda", "İçecek", "Temizlik", "Atıştırmalık", "Kozmetik", "Diğer"]
+    // let categories = ["Gıda", "İçecek", "Temizlik", "Atıştırmalık", "Kozmetik", "Diğer"]
     
     var body: some View {
         NavigationStack {
@@ -50,11 +50,13 @@ struct AddProductView: View {
                         }
                     }
                     
+                    /*
                     Picker("Kategori", selection: $selectedCategory) {
                         ForEach(categories, id: \.self) {
                             Text($0)
                         }
                     }
+                    */
                 }
                 
                 // Display identified brand if Gemini AI found it.
@@ -87,7 +89,7 @@ struct AddProductView: View {
                         viewModel.confirmItem(
                             editedName: editedName,
                             editedPrice: editedPrice,
-                            category: selectedCategory,
+                            // category: selectedCategory,
                             quantity: quantity,
                             activeSession: activeSession,
                             context: context
