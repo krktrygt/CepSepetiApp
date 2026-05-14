@@ -18,7 +18,7 @@ struct CepSepetiAppApp: App {
         }
         // Initialize the SwiftData container for persisting sessions and items.
         // Oturumları ve öğeleri saklamak için SwiftData kapsayıcısını başlatın.
-        .modelContainer(for :[ShoppingSession.self, ShoppingItem.self])
+        .modelContainer(for :[ShoppingSession.self, ShoppingItem.self, OCRLog.self])
     }
 }
 

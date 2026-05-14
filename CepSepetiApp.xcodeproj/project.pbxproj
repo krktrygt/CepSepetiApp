@@ -10,8 +10,19 @@
 		50BBEE582F962D8D006047DF /* Secrets.plist in Resources */ = {isa = PBXBuildFile; fileRef = 50BBEE572F962D8D006047DF /* Secrets.plist */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		50A3432A2FB1F9C5007E5FCA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5062DA802F523A8E00A28B29 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5062DA872F523A8F00A28B29;
+			remoteInfo = CepSepetiApp;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		5062DA882F523A8F00A28B29 /* CepSepetiApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CepSepetiApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		50A343262FB1F9C5007E5FCA /* CepSepetiAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CepSepetiAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		50BBEE572F962D8D006047DF /* Secrets.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Secrets.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -21,10 +32,22 @@
 			path = CepSepetiApp;
 			sourceTree = "<group>";
 		};
+		50A343272FB1F9C5007E5FCA /* CepSepetiAppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = CepSepetiAppTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		5062DA852F523A8F00A28B29 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		50A343232FB1F9C5007E5FCA /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -39,6 +62,7 @@
 			children = (
 				50BBEE572F962D8D006047DF /* Secrets.plist */,
 				5062DA8A2F523A8F00A28B29 /* CepSepetiApp */,
+				50A343272FB1F9C5007E5FCA /* CepSepetiAppTests */,
 				5062DA892F523A8F00A28B29 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -47,6 +71,7 @@
 			isa = PBXGroup;
 			children = (
 				5062DA882F523A8F00A28B29 /* CepSepetiApp.app */,
+				50A343262FB1F9C5007E5FCA /* CepSepetiAppTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -76,6 +101,29 @@
 			productReference = 5062DA882F523A8F00A28B29 /* CepSepetiApp.app */;
 			productType = "com.apple.product-type.application";
 		};
+		50A343252FB1F9C5007E5FCA /* CepSepetiAppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 50A3432E2FB1F9C5007E5FCA /* Build configuration list for PBXNativeTarget "CepSepetiAppTests" */;
+			buildPhases = (
+				50A343222FB1F9C5007E5FCA /* Sources */,
+				50A343232FB1F9C5007E5FCA /* Frameworks */,
+				50A343242FB1F9C5007E5FCA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				50A3432B2FB1F9C5007E5FCA /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				50A343272FB1F9C5007E5FCA /* CepSepetiAppTests */,
+			);
+			name = CepSepetiAppTests;
+			packageProductDependencies = (
+			);
+			productName = CepSepetiAppTests;
+			productReference = 50A343262FB1F9C5007E5FCA /* CepSepetiAppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -83,11 +131,15 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2630;
+				LastSwiftUpdateCheck = 2640;
 				LastUpgradeCheck = 2640;
 				TargetAttributes = {
 					5062DA872F523A8F00A28B29 = {
 						CreatedOnToolsVersion = 26.3;
+					};
+					50A343252FB1F9C5007E5FCA = {
+						CreatedOnToolsVersion = 26.4.1;
+						TestTargetID = 5062DA872F523A8F00A28B29;
 					};
 				};
 			};
@@ -106,6 +158,7 @@
 			projectRoot = "";
 			targets = (
 				5062DA872F523A8F00A28B29 /* CepSepetiApp */,
+				50A343252FB1F9C5007E5FCA /* CepSepetiAppTests */,
 			);
 		};
 /* End PBXProject section */
@@ -119,6 +172,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		50A343242FB1F9C5007E5FCA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -129,7 +189,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		50A343222FB1F9C5007E5FCA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		50A3432B2FB1F9C5007E5FCA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5062DA872F523A8F00A28B29 /* CepSepetiApp */;
+			targetProxy = 50A3432A2FB1F9C5007E5FCA /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		5062DA912F523A9000A28B29 /* Debug */ = {
@@ -264,7 +339,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSCameraUsageDescription = "Barkod okumak için";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Alışverişlerinizde fiyat etiketlerini tarayabilmek için kameranıza erişmemiz gerekiyor.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -296,7 +371,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSCameraUsageDescription = "Barkod okumak için";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Alışverişlerinizde fiyat etiketlerini tarayabilmek için kameranıza erişmemiz gerekiyor.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -319,6 +394,50 @@
 			};
 			name = Release;
 		};
+		50A3432C2FB1F9C5007E5FCA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CQVDH425Q3;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Korkut.CepSepetiAppTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CepSepetiApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CepSepetiApp";
+			};
+			name = Debug;
+		};
+		50A3432D2FB1F9C5007E5FCA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CQVDH425Q3;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Korkut.CepSepetiAppTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CepSepetiApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/CepSepetiApp";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -336,6 +455,15 @@
 			buildConfigurations = (
 				5062DA942F523A9000A28B29 /* Debug */,
 				5062DA952F523A9000A28B29 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		50A3432E2FB1F9C5007E5FCA /* Build configuration list for PBXNativeTarget "CepSepetiAppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				50A3432C2FB1F9C5007E5FCA /* Debug */,
+				50A3432D2FB1F9C5007E5FCA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

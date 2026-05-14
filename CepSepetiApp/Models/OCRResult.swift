@@ -18,6 +18,9 @@ enum OCRResult {
     /// Indicates a failed OCR process with an associated error.
     /// İlişkili bir hata ile başarısız bir OCR sürecini belirtir.
     case failure(OCRError)
+    /// Indicates that Gemini AI failed but local OCR results are available.
+    /// Gemini AI'nın başarısız olduğunu ancak yerel OCR sonuçlarının mevcut olduğunu belirtir.
+    case localFallback(PriceTagData)
 }
 
 /// Defines the specific errors that can occur during the OCR and analysis process.

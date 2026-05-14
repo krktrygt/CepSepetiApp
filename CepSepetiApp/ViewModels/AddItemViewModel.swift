@@ -34,19 +34,24 @@ final class AddItemViewModel {
     /// Stores any error message encountered during the process.
     /// İşlem sırasında karşılaşılan herhangi bir hata mesajını saklar.
     var errorMessage: String? = nil
+    /// Flag to control the display of the error alert.
+    /// Hata uyarısının görüntülenmesini kontrol eden bayrak.
+    var showErrorAlert: Bool = false
     /// Flag to control the display of the confirmation UI.
     /// Onay UI'ının görüntülenmesini kontrol eden bayrak.
     var showConfirmation: Bool = false
     
     /// Initiates the photo capture and sends it through the processing pipeline.
     /// Fotoğraf yakalamayı başlatır ve işleme hattına gönderir.
-    func captureAndProcess() {
+    /// - Parameter context: The SwiftData ModelContext for logging.
+    func captureAndProcess(context: ModelContext) {
         // Prevent multiple simultaneous processing requests.
         // Aynı anda birden fazla işleme isteğini önleyin.
         guard !isProcessing else { return }
         
         isProcessing = true
         errorMessage = nil
+        showErrorAlert = false
         ocrResult = nil
         
         Task {
@@ -57,7 +62,7 @@ final class AddItemViewModel {
                 
                 // Step 2: Pass the image to the processing pipeline (OCR + AI).
                 // Adım 2: Görüntüyü işleme hattına (OCR + Yapay Zeka) geçirin.
-                let result = await pipeline.process(image: image)
+                let result = await pipeline.process(image: image, context: context)
                 
                 // Step 3: Update state based on the pipeline's outcome.
                 // Adım 3: Hattın sonucuna göre durumu güncelleyin.
@@ -65,11 +70,18 @@ final class AddItemViewModel {
                 case .success(let data):
                     self.ocrResult = data
                     self.showConfirmation = true
+                case .localFallback(let data):
+                    self.ocrResult = data
+                    self.errorMessage = "Yapay zeka bağlantısı kurulamadı. Fiyat etiketi yerel motorla okundu, lütfen manuel kontrol edin."
+                    self.showErrorAlert = true
+                    self.showConfirmation = true
                 case .failure(let error):
                     self.errorMessage = error.localizedDescription
+                    self.showErrorAlert = true
                 }
             } catch {
                 self.errorMessage = "Kamera hatası: Fotoğraf çekilemedi."
+                self.showErrorAlert = true
             }
             self.isProcessing = false
         }

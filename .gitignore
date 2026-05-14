@@ -10,3 +10,8 @@ project.xcworkspace/xcuserdata/
 Secrets.plist
 Assets.xcassets
 GEMINI.md
+CepSepetiTagger1.mlmodel
+CepSepetiAppTests
+LocalOCRParserServiceTests.swift
+CepSepetiAppTests.swift
+Rapor.md

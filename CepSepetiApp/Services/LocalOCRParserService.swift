@@ -23,7 +23,7 @@ final class LocalOCRParserService {
         "M1LK": "MILK", "ULKER": "ÜLKER", "SUTAS": "SÜTAŞ", "PINAR": "PINAR",
         "ETI": "ETİ", "ETI.": "ETİ", "AYTAÇ": "AYTAÇ", "AYTAC": "AYTAÇ", "TORKU": "TORKU",
         "NESTLE": "NESTLÉ", "MİLKA": "MILKA", "MILKA": "MILKA",
-        "COCA-COLA": "COCA-COLA", "COCA COLA": "COCA-COLA", "PEPSI": "PEPSI", "PEPSİ": "PEPSI", "LIPTON": "LIPTON", "LİPTON": "LIPTON",
+        "COCA-COLA": "COCA-COLA", "COCA COLA": "COCA-COLA", "COCA": "COCA-COLA", "PEPSI": "PEPSI", "PEPSİ": "PEPSI", "LIPTON": "LIPTON", "LİPTON": "LIPTON",
         "DANONE": "DANONE", "ALGİDA": "ALGIDA", "ALGIDA": "ALGIDA", "UNO": "UNO", "ŞÖLEN": "ŞÖLEN", "SOLEN": "ŞÖLEN",
         "BEYPAZARI": "BEYPAZARI", "BEYPAZAR": "BEYPAZARI", "KIZILAY": "KIZILAY", "SARIKIZ": "SARIKIZ",
         "ÇAYKUR": "ÇAYKUR", "CAYKUR": "ÇAYKUR", "DOĞUŞ": "DOĞUŞ", "DOGUS": "DOĞUŞ",
@@ -46,7 +46,7 @@ final class LocalOCRParserService {
     ]
     
     // Invalid brands (Logos or generic words often appearing at the top)
-    private let invalidBrands: Set<String> = ["YERLİ", "YERLI", "ÜRETİM", "URETIM", "KDV", "İNDİRİM", "INDIRIM"]
+    private let invalidBrands: Set<String> = ["YERLİ", "YERLI", "ÜRETİM", "URETIM", "KDV", "İNDİRİM", "INDIRIM", "MIGROS", "MİGROS", "BIM", "BİM", "A101", "SOK", "ŞOK", "CARREFOUR", "FİŞ", "FIS"]
     
     /// Parses raw OCR text to extract product details and calculate a confidence score.
     func parse(ocrText: String) -> PriceTagData {
@@ -65,10 +65,26 @@ final class LocalOCRParserService {
         if priceDecimal == 0 {
             confidenceScore = 0.0
         } else if conflictingPrices {
-            confidenceScore -= 0.2
+            confidenceScore -= 0.4 // Heavier penalty for conflicting prices
         }
         
         if nameTokens.count < 2 {
+            confidenceScore -= 0.2
+        }
+        
+        // Extra penalty for very short names (less than 4 chars)
+        if name.count < 4 {
+            confidenceScore -= 0.2
+        }
+        
+        // Penalty for missing brand
+        if brand == nil {
+            confidenceScore -= 0.1
+        }
+        
+        // Penalty for high symbol/junk ratio in name
+        let symbolCount = name.filter { !$0.isLetter && !$0.isNumber && !$0.isWhitespace }.count
+        if name.count > 0 && Double(symbolCount) / Double(name.count) > 0.2 {
             confidenceScore -= 0.3
         }
         
@@ -87,17 +103,26 @@ final class LocalOCRParserService {
     
     private func extractBrand(from lines: [String]) -> String? {
         let trLocale = Locale(identifier: "tr-TR")
+        
+        // Phase 1: Look for explicit brands in normalization list
+        for line in lines {
+            let words = line.components(separatedBy: .whitespaces)
+            for word in words {
+                let upperWord = word.uppercased(with: trLocale).trimmingCharacters(in: .punctuationCharacters)
+                if let normalized = brandNormalizations[upperWord] {
+                    return normalized
+                }
+            }
+        }
+        
+        // Phase 2: Fallback to first unknown uppercase word
         for line in lines {
             let words = line.components(separatedBy: .whitespaces)
             guard let firstWord = words.first else { continue }
             
-            let upperFirstWord = firstWord.uppercased(with: trLocale)
+            let upperFirstWord = firstWord.uppercased(with: trLocale).trimmingCharacters(in: .punctuationCharacters)
             
             if validUnits.contains(upperFirstWord) || invalidBrands.contains(upperFirstWord) { continue }
-            
-            if let normalized = brandNormalizations[upperFirstWord] {
-                return normalized
-            }
             
             if firstWord == upperFirstWord && firstWord.count > 2 && firstWord.rangeOfCharacter(from: CharacterSet.decimalDigits) == nil {
                 return firstWord
@@ -112,7 +137,7 @@ final class LocalOCRParserService {
         
         let trLocale = Locale(identifier: "tr-TR")
         
-        let trashWords = ["DAHIL", "DAHİL", "PAYLAS", "PAYLAŞ", "ZIYARET", "ŞIKAYETVAR", "ŞİKAYETVAR", "TIKTOK", "ARAMAK", "ARA", "GOOGLE", "TARINI", "TARIHI", "TARİHİ", "X", "YERLİ", "YERLI", "ÜRETİM", "URETIM", "URETİM", "ÜRETIM", "ADET", "YURTBAŞI", "ELAZIG", "ELAZIĞ"]
+        let trashWords = ["DAHIL", "DAHİL", "PAYLAS", "PAYLAŞ", "ZIYARET", "ŞIKAYETVAR", "ŞİKAYETVAR", "TIKTOK", "ARAMAK", "ARA", "GOOGLE", "TARINI", "TARIHI", "TARİHİ", "X", "YERLİ", "YERLI", "ÜRETİM", "URETIM", "URETİM", "ÜRETIM", "ADET", "YURTBAŞI", "ELAZIG", "ELAZIĞ", "TOPLAM", "FIS", "FİŞ", "TARIH", "TARİH"]
         
         var skipNextLine = false
         
@@ -125,18 +150,19 @@ final class LocalOCRParserService {
             let upperLine = line.uppercased(with: trLocale)
             
             // Fast fail lines: Skip if they contain tax, unit prices, or percentages
-            if upperLine.contains("KDV") || upperLine.contains("%") || upperLine.contains("/ KG") || upperLine.contains("/KG") || upperLine.contains("/ ADET") || upperLine.contains("/ADET") || upperLine.contains("1KG") || upperLine.contains("1LT") || upperLine.contains("FIYAT") || upperLine.contains("FİYAT") {
+            // Modified: Don't skip if it contains common size formats like 1KG unless it's clearly a unit price line
+            let isUnitPriceLine = upperLine.contains("/ KG") || upperLine.contains("/KG") || upperLine.contains("/ ADET") || upperLine.contains("/ADET")
+            if upperLine.contains("KDV") || upperLine.contains("%") || isUnitPriceLine || upperLine.contains("FIYAT") || upperLine.contains("FİYAT") {
                 continue
             }
             
-            // Metadata Trigger: Skip this line and the immediate next line (which usually contains the value like 'Ukrayna')
+            // Metadata Trigger: Skip this line and the immediate next line
             if upperLine.contains("Ü.YER") || upperLine.contains("MENŞE") || upperLine.contains("TARİH") || upperLine.contains("TETT") || upperLine.contains("SKT") || upperLine.contains("PNT") {
                 skipNextLine = true
                 continue
             }
             
             var cleanLine = line
-            // Strip dates and times completely so they are never parsed as words
             cleanLine = dateRegex.stringByReplacingMatches(in: cleanLine, options: [], range: NSRange(location: 0, length: cleanLine.utf16.count), withTemplate: " ")
             cleanLine = timeRegex.stringByReplacingMatches(in: cleanLine, options: [], range: NSRange(location: 0, length: cleanLine.utf16.count), withTemplate: " ")
             cleanLine = priceRegex.stringByReplacingMatches(in: cleanLine, options: [], range: NSRange(location: 0, length: cleanLine.utf16.count), withTemplate: " ")
@@ -155,10 +181,9 @@ final class LocalOCRParserService {
                 
                 if hasLetters && !hasDigits {
                     // PURE WORD
-                    if token.count == 1 && !validUnits.contains(upperToken) { continue } // Drop random single letters
+                    if token.count == 1 && !validUnits.contains(upperToken) { continue }
                     if trashWords.contains(upperToken) { continue }
                     if validUnits.contains(upperToken) {
-                        // Only add isolated unit if it follows a number
                         if index > 0, tokens[index-1].rangeOfCharacter(from: CharacterSet.decimalDigits) != nil {
                             if !nameTokens.contains(upperToken) { nameTokens.append(upperToken) }
                         }
@@ -171,7 +196,6 @@ final class LocalOCRParserService {
                     
                 } else if hasDigits && !hasLetters {
                     // PURE NUMBER
-                    // Keep ONLY if it acts as a size modifier for the next token (e.g. '80' then 'G')
                     if index + 1 < tokens.count {
                         let nextToken = tokens[index + 1].trimmingCharacters(in: .punctuationCharacters).uppercased(with: trLocale)
                         if validUnits.contains(nextToken) {
@@ -195,10 +219,15 @@ final class LocalOCRParserService {
                     let letters = token.components(separatedBy: CharacterSet.letters.inverted).joined().uppercased(with: trLocale)
                     let digits = token.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
                     
-                    if token.hasPrefix(digits) && token.hasSuffix(letters) && validUnits.contains(letters) {
+                    if !letters.isEmpty && !digits.isEmpty && token.hasPrefix(digits) && token.hasSuffix(letters) && validUnits.contains(letters) {
                         nameTokens.append(upperToken)
                         if let val = Double(digits) {
                             sizeInKg = (letters == "G" || letters == "GR" || letters == "ML" || letters == "CC") ? (val / 1000.0) : val
+                        }
+                    } else {
+                        // Just a generic mixed token (like '5LI' or '2.5LT' or similar)
+                        if !nameTokens.contains(upperToken) && !trashWords.contains(upperToken) {
+                            nameTokens.append(upperToken)
                         }
                     }
                 }
@@ -232,6 +261,16 @@ final class LocalOCRParserService {
                 
                 if matchRange.location != NSNotFound, let r = Range(matchRange, in: cleanLine) {
                     let priceStr = String(cleanLine[r]).replacingOccurrences(of: ",", with: ".")
+                    
+                    // NEW: Check if this price is followed by a unit (e.g. 1.5 LT), if so, it's a size, not a price
+                    let afterRange = NSRange(location: match.range.upperBound, length: cleanLine.utf16.count - match.range.upperBound)
+                    let textAfter = (cleanLine as NSString).substring(with: afterRange).trimmingCharacters(in: .whitespaces)
+                    let firstWordAfter = textAfter.components(separatedBy: .whitespaces).first?.uppercased(with: Locale(identifier: "tr-TR")).trimmingCharacters(in: .punctuationCharacters) ?? ""
+                    
+                    if validUnits.contains(firstWordAfter) {
+                        continue
+                    }
+                    
                     if let decimal = Decimal(string: priceStr) {
                         // Safely reject common date components that slipped through or tiny artifacts
                         if decimal > Decimal(0.0) && decimal < Decimal(100000) {

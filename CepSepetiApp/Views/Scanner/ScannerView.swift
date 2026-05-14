@@ -113,7 +113,7 @@ struct ScannerView: View {
                         // Capture button to take a photo and start OCR analysis
                         // Fotoğraf çekmek ve OCR analizini başlatmak için yakalama butonu
                         Button(action: {
-                            viewModel.captureAndProcess()
+                            viewModel.captureAndProcess(context: context)
                         }) {
                             Circle()
                                 .fill(Color.white)
@@ -183,12 +183,9 @@ struct ScannerView: View {
                         .presentationDetents([.fraction(0.85), .medium])
                 }
             }
-            // Show alert on processing failure
-            // İşleme hatasında uyarı gösterin
-            .alert("Analiz Hatası", isPresented: Binding(
-                get: { viewModel.errorMessage != nil },
-                set: { if !$0 { viewModel.errorMessage = nil } }
-            )) {
+            // Show alert on processing failure or fallback
+            // İşleme hatasında veya geri dönüşte (fallback) uyarı gösterin
+            .alert("Bilgi", isPresented: $viewModel.showErrorAlert) {
                 Button("Tamam", role: .cancel) { }
             } message: {
                 if let message = viewModel.errorMessage {

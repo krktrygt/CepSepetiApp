@@ -7,18 +7,27 @@
 
 import Foundation
 
+/// Custom error types for Gemini Service.
+/// Gemini Servisi için özel hata türleri.
+enum GeminiError: Error {
+    case missingAPIKey
+    case networkError(String)
+    case invalidResponse
+    case parsingFailed
+}
+
 /// A service that interacts with Google's Gemini AI API to analyze and parse OCR text into structured data.
 /// OCR metnini analiz etmek ve yapılandırılmış verilere ayrıştırmak için Google'ın Gemini AI API'si ile etkileşime giren bir servis.
 final class GeminiService {
     
     /// Retrieves the Gemini API key from the Secrets.plist file.
     /// Gemini API anahtarını Secrets.plist dosyasından alır.
-    private var apiKey: String {
+    private func getApiKey() throws -> String {
         guard let filePath = Bundle.main.path(forResource: "Secrets", ofType: "plist"),
               let plist = NSDictionary(contentsOfFile: filePath),
               let value = plist.object(forKey: "GEMINI_API_KEY") as? String,
               !value.isEmpty else {
-            fatalError("ERROR: Secrets.plist file or GEMINI_API_KEY not found!")
+            throw GeminiError.missingAPIKey
         }
         return value
     }
@@ -32,8 +41,10 @@ final class GeminiService {
     /// - Parameter ocrText: The raw text extracted from an image.
     /// - Returns: A structured PriceTagData object.
     func parse(ocrText: String) async throws -> PriceTagData {
-        guard let url = URL(string: "\(endpoint)?key=\(apiKey)") else {
-            throw OCRError.parsingFailed
+        let key = try getApiKey()
+        
+        guard let url = URL(string: "\(endpoint)?key=\(key)") else {
+            throw GeminiError.invalidResponse
         }
         
         // Detailed prompt to guide the LLM to extract product name, price, and brand in a strict JSON format.
@@ -79,10 +90,10 @@ final class GeminiService {
             if httpResponse.statusCode != 200 {
                 let serverErrorMessage = String(data: data, encoding: .utf8) ?? "Mesaj okunamadı"
                 print("🚨 GOOGLE API ERROR DETAIL:\n\(serverErrorMessage)")
-                throw OCRError.geminiError("Sunucu Hatası. Kod: \(httpResponse.statusCode)")
+                throw GeminiError.networkError("Sunucu Hatası. Kod: \(httpResponse.statusCode)")
             }
         } else {
-            throw OCRError.geminiError("Geçersiz sunucu yanıtı.")
+            throw GeminiError.invalidResponse
         }
 
         // Parse the hierarchical JSON response from Gemini into PriceTagData.
@@ -94,7 +105,7 @@ final class GeminiService {
                     let parts = content["parts"] as? [[String: Any]],
                     let text = parts.first?["text"] as? String,
                     let finalData = text.data(using: .utf8) else {
-                throw OCRError.parsingFailed
+                throw GeminiError.parsingFailed
             }
                    
             var parsedData = try JSONDecoder().decode(PriceTagData.self, from: finalData)
@@ -108,7 +119,7 @@ final class GeminiService {
             return parsedData
                    
         } catch {
-            throw OCRError.geminiError("Gelen veriler anlaşılamadı.")
+            throw GeminiError.parsingFailed
         }
     }
 }
