@@ -89,6 +89,7 @@ struct AddProductView: View {
                         viewModel.confirmItem(
                             editedName: editedName,
                             editedPrice: editedPrice,
+                            brand: viewModel.ocrResult?.brand,
                             // category: selectedCategory,
                             quantity: quantity,
                             activeSession: activeSession,

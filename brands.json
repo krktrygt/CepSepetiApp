@@ -1,0 +1,2441 @@
+[
+  {
+    "canonical_name": "ÜLKER",
+    "aliases": [
+      "ULKER"
+    ],
+    "label_abbreviations": [
+      "ULK.",
+      "ULKR."
+    ],
+    "normalized_aliases": [
+      "ulker",
+      "ülker"
+    ],
+    "ocr_variants": [
+      "VLKER",
+      "ULK3R",
+      "VLK3R"
+    ],
+    "markets": [],
+    "categories": [
+      "Snacks",
+      "Pantry"
+    ]
+  },
+  {
+    "canonical_name": "ETİ",
+    "aliases": [
+      "ETI"
+    ],
+    "label_abbreviations": [
+      "ETI."
+    ],
+    "normalized_aliases": [
+      "eti",
+      "eti̇"
+    ],
+    "ocr_variants": [
+      "ET1",
+      "FTI",
+      "FT1"
+    ],
+    "markets": [],
+    "categories": [
+      "Snacks",
+      "Pantry"
+    ]
+  },
+  {
+    "canonical_name": "TORKU",
+    "aliases": [],
+    "label_abbreviations": [
+      "TRK.",
+      "TORK."
+    ],
+    "normalized_aliases": [
+      "torku"
+    ],
+    "ocr_variants": [
+      "T0RKU",
+      "7ORKU",
+      "70RKU"
+    ],
+    "markets": [],
+    "categories": [
+      "Pantry",
+      "Dairy",
+      "Snacks",
+      "Beverage"
+    ]
+  },
+  {
+    "canonical_name": "SÜTAŞ",
+    "aliases": [
+      "SUTAS"
+    ],
+    "label_abbreviations": [
+      "SUT.",
+      "SUTS."
+    ],
+    "normalized_aliases": [
+      "sutas",
+      "sütaş"
+    ],
+    "ocr_variants": [
+      "5UTAS",
+      "SVTAS",
+      "5VTAS"
+    ],
+    "markets": [],
+    "categories": [
+      "Dairy"
+    ]
+  },
+  {
+    "canonical_name": "PINAR",
+    "aliases": [],
+    "label_abbreviations": [
+      "PIN.",
+      "PNR."
+    ],
+    "normalized_aliases": [
+      "pinar"
+    ],
+    "ocr_variants": [
+      "P1NAR",
+      "PLNAR",
+      "P1N4R"
+    ],
+    "markets": [],
+    "categories": [
+      "Dairy",
+      "Meat & Poultry",
+      "Beverage",
+      "Pantry"
+    ]
+  },
+  {
+    "canonical_name": "DOST",
+    "aliases": [],
+    "label_abbreviations": [
+      "DST.",
+      "DOS."
+    ],
+    "normalized_aliases": [
+      "dost"
+    ],
+    "ocr_variants": [
+      "D05T",
+      "D0ST",
+      "DOS7"
+    ],
+    "markets": [
+      "BİM"
+    ],
+    "categories": [
+      "Dairy"
+    ]
+  },
+  {
+    "canonical_name": "BİRŞAH",
+    "aliases": [
+      "BIRSAH"
+    ],
+    "label_abbreviations": [
+      "BIR.",
+      "BRS."
+    ],
+    "normalized_aliases": [
+      "birsah",
+      "bi̇rsah",
+      "bi̇rşah"
+    ],
+    "ocr_variants": [
+      "B1RSAH",
+      "BLRSAH",
+      "B1R5AH"
+    ],
+    "markets": [
+      "A101"
+    ],
+    "categories": [
+      "Dairy"
+    ]
+  },
+  {
+    "canonical_name": "MİS",
+    "aliases": [
+      "MIS"
+    ],
+    "label_abbreviations": [
+      "MIS."
+    ],
+    "normalized_aliases": [
+      "mis",
+      "mi̇s"
+    ],
+    "ocr_variants": [
+      "M1S",
+      "MLS",
+      "M!S"
+    ],
+    "markets": [
+      "ŞOK"
+    ],
+    "categories": [
+      "Dairy"
+    ]
+  },
+  {
+    "canonical_name": "HARRAS",
+    "aliases": [],
+    "label_abbreviations": [
+      "HAR.",
+      "HRS."
+    ],
+    "normalized_aliases": [
+      "harras"
+    ],
+    "ocr_variants": [
+      "H4RRAS",
+      "HARR4S",
+      "H4RR45"
+    ],
+    "markets": [
+      "File Market"
+    ],
+    "categories": [
+      "Pantry",
+      "Dairy",
+      "Beverage",
+      "Snacks",
+      "Frozen"
+    ]
+  },
+  {
+    "canonical_name": "ACTISOFT",
+    "aliases": [
+      "ACTI SOFT"
+    ],
+    "label_abbreviations": [
+      "ACT.",
+      "ACTS."
+    ],
+    "normalized_aliases": [
+      "acti soft",
+      "acti-soft",
+      "actisoft"
+    ],
+    "ocr_variants": [
+      "AC7150FT",
+      "ACT150FT",
+      "AC7ISOFT"
+    ],
+    "markets": [
+      "File Market"
+    ],
+    "categories": [
+      "Cleaning",
+      "Household"
+    ]
+  },
+  {
+    "canonical_name": "TARIM KREDİ",
+    "aliases": [
+      "TARIM KREDI",
+      "TARIMKREDI"
+    ],
+    "label_abbreviations": [
+      "T.KREDI.",
+      "T.K.",
+      "TAR.KRED."
+    ],
+    "normalized_aliases": [
+      "tarim kredi",
+      "tarim kredi̇",
+      "tarim-kredi",
+      "tarim-kredi̇",
+      "tarimkredi",
+      "tarimkredi̇"
+    ],
+    "ocr_variants": [
+      "7ARIM KREDI",
+      "TAR1M KRED1",
+      "TARlM KREDl"
+    ],
+    "markets": [],
+    "categories": [
+      "Pantry",
+      "Dairy",
+      "Beverage"
+    ]
+  },
+  {
+    "canonical_name": "TKS",
+    "aliases": [],
+    "label_abbreviations": [
+      "TKS."
+    ],
+    "normalized_aliases": [
+      "tks"
+    ],
+    "ocr_variants": [
+      "7KS",
+      "TK5",
+      "7K5"
+    ],
+    "markets": [],
+    "categories": [
+      "Dairy"
+    ]
+  },
+  {
+    "canonical_name": "ZEL",
+    "aliases": [],
+    "label_abbreviations": [
+      "ZEL."
+    ],
+    "normalized_aliases": [
+      "zel"
+    ],
+    "ocr_variants": [
+      "2EL",
+      "ZFL",
+      "ZFI",
+      "2FL"
+    ],
+    "markets": [],
+    "categories": [
+      "Pantry",
+      "Meat & Poultry"
+    ]
+  },
+  {
+    "canonical_name": "AMİGO",
+    "aliases": [],
+    "label_abbreviations": [
+      "AMG."
+    ],
+    "normalized_aliases": [
+      "ami̇go"
+    ],
+    "ocr_variants": [
+      "AM1GO",
+      "AMIG0",
+      "AM1G0",
+      "AMIC0",
+      "4M1G0"
+    ],
+    "markets": [
+      "ŞOK"
+    ],
+    "categories": [
+      "Snacks"
+    ]
+  },
+  {
+    "canonical_name": "PİYALE",
+    "aliases": [
+      "PIYALE"
+    ],
+    "label_abbreviations": [
+      "PIY."
+    ],
+    "normalized_aliases": [
+      "piyale",
+      "pi̇yale"
+    ],
+    "ocr_variants": [
+      "P1YALE",
+      "PLYALE",
+      "PIYAL3"
+    ],
+    "markets": [
+      "ŞOK"
+    ],
+    "categories": [
+      "Pantry"
+    ]
+  },
+  {
+    "canonical_name": "MİNTAX",
+    "aliases": [
+      "MINTAX"
+    ],
+    "label_abbreviations": [
+      "MNT.",
+      "MNTX."
+    ],
+    "normalized_aliases": [
+      "mintax",
+      "mi̇ntax"
+    ],
+    "ocr_variants": [
+      "M1NTAX",
+      "MLNTAX",
+      "M1N7AX"
+    ],
+    "markets": [
+      "ŞOK"
+    ],
+    "categories": [
+      "Cleaning"
+    ]
+  },
+  {
+    "canonical_name": "EVİN",
+    "aliases": [
+      "EVIN"
+    ],
+    "label_abbreviations": [
+      "EVN."
+    ],
+    "normalized_aliases": [
+      "evin",
+      "evi̇n"
+    ],
+    "ocr_variants": [
+      "FVIN",
+      "EV1N",
+      "EVLN",
+      "FV1N"
+    ],
+    "markets": [
+      "ŞOK"
+    ],
+    "categories": [
+      "Pantry"
+    ]
+  },
+  {
+    "canonical_name": "PEKİ",
+    "aliases": [
+      "PEKI"
+    ],
+    "label_abbreviations": [
+      "PKI.",
+      "PEK."
+    ],
+    "normalized_aliases": [
+      "peki",
+      "peki̇"
+    ],
+    "ocr_variants": [
+      "PEK1",
+      "PFKI",
+      "PEXI",
+      "P5K1"
+    ],
+    "markets": [
+      "ŞOK"
+    ],
+    "categories": [
+      "Snacks"
+    ]
+  },
+  {
+    "canonical_name": "KARMEN",
+    "aliases": [],
+    "label_abbreviations": [
+      "KRM.",
+      "KARM."
+    ],
+    "normalized_aliases": [
+      "karmen"
+    ],
+    "ocr_variants": [
+      "K4RMEN",
+      "KARM3N",
+      "K4RM3N"
+    ],
+    "markets": [
+      "ŞOK"
+    ],
+    "categories": [
+      "Snacks"
+    ]
+  },
+  {
+    "canonical_name": "ANADOLU MUTFAĞI",
+    "aliases": [
+      "ANADOLU MUTFAĞI",
+      "ANADOLU MUTFAGI",
+      "ANADOLUMUTFAGI"
+    ],
+    "label_abbreviations": [
+      "AND.MUT.",
+      "A.MUT."
+    ],
+    "normalized_aliases": [
+      "anadolu mutfagi",
+      "anadolu mutfaği",
+      "anadolu-mutfagi",
+      "anadolu-mutfaği",
+      "anadolumutfagi",
+      "anadolumutfaği"
+    ],
+    "ocr_variants": [
+      "ANAD0LV MV7FAGI",
+      "ANADOLV MUTFA6I"
+    ],
+    "markets": [
+      "ŞOK"
+    ],
+    "categories": [
+      "Pantry"
+    ]
+  },
+  {
+    "canonical_name": "BUONO",
+    "aliases": [],
+    "label_abbreviations": [
+      "BUON.",
+      "BNO."
+    ],
+    "normalized_aliases": [
+      "buono"
+    ],
+    "ocr_variants": [
+      "BV0N0",
+      "BU0N0",
+      "BUON0"
+    ],
+    "markets": [
+      "BİM"
+    ],
+    "categories": [
+      "Snacks"
+    ]
+  },
+  {
+    "canonical_name": "SİMBAT",
+    "aliases": [
+      "SIMBAT"
+    ],
+    "label_abbreviations": [
+      "SMB.",
+      "SIM."
+    ],
+    "normalized_aliases": [
+      "simbat",
+      "si̇mbat"
+    ],
+    "ocr_variants": [
+      "51MBAT",
+      "S1MB4T",
+      "5IMBAT"
+    ],
+    "markets": [
+      "BİM"
+    ],
+    "categories": [
+      "Snacks"
+    ]
+  },
+  {
+    "canonical_name": "PATİTO",
+    "aliases": [],
+    "label_abbreviations": [
+      "PAT.",
+      "PTT."
+    ],
+    "normalized_aliases": [
+      "pati̇to"
+    ],
+    "ocr_variants": [
+      "P4T1T0",
+      "PAT1T0",
+      "P4TITO"
+    ],
+    "markets": [
+      "BİM"
+    ],
+    "categories": [
+      "Snacks"
+    ]
+  },
+  {
+    "canonical_name": "CENTRO",
+    "aliases": [],
+    "label_abbreviations": [
+      "CNT.",
+      "CENT."
+    ],
+    "normalized_aliases": [
+      "centro"
+    ],
+    "ocr_variants": [
+      "C3NTRO",
+      "CEN7RO",
+      "C3N7R0"
+    ],
+    "markets": [
+      "BİM"
+    ],
+    "categories": [
+      "Snacks"
+    ]
+  },
+  {
+    "canonical_name": "SÜSSE",
+    "aliases": [
+      "SUSSE"
+    ],
+    "label_abbreviations": [
+      "SUS.",
+      "SUSS."
+    ],
+    "normalized_aliases": [
+      "susse",
+      "süsse"
+    ],
+    "ocr_variants": [
+      "5V55E",
+      "5USSE",
+      "SV553"
+    ],
+    "markets": [
+      "BİM"
+    ],
+    "categories": [
+      "Snacks"
+    ]
+  },
+  {
+    "canonical_name": "PERİPELLA",
+    "aliases": [
+      "PERIPELLA"
+    ],
+    "label_abbreviations": [
+      "PER.",
+      "PRP."
+    ],
+    "normalized_aliases": [
+      "peripella",
+      "peri̇pella"
+    ],
+    "ocr_variants": [
+      "P3RIP3LLA",
+      "PER1PELL4",
+      "P3R1P3LL4"
+    ],
+    "markets": [
+      "BİM"
+    ],
+    "categories": [
+      "Snacks",
+      "Pantry"
+    ]
+  },
+  {
+    "canonical_name": "PARTY",
+    "aliases": [],
+    "label_abbreviations": [
+      "PRT.",
+      "PTY."
+    ],
+    "normalized_aliases": [
+      "party"
+    ],
+    "ocr_variants": [
+      "P4RTY",
+      "PAR7Y",
+      "P4R7Y"
+    ],
+    "markets": [
+      "BİM"
+    ],
+    "categories": [
+      "Snacks"
+    ]
+  },
+  {
+    "canonical_name": "LE COLA",
+    "aliases": [
+      "LECOLA"
+    ],
+    "label_abbreviations": [
+      "LE COL.",
+      "LE."
+    ],
+    "normalized_aliases": [
+      "le cola",
+      "le-cola",
+      "lecola"
+    ],
+    "ocr_variants": [
+      "LFC0LA",
+      "1E COLA",
+      "LE C0LA",
+      "1EC0L4"
+    ],
+    "markets": [
+      "BİM"
+    ],
+    "categories": [
+      "Beverage"
+    ]
+  },
+  {
+    "canonical_name": "KARAYEL",
+    "aliases": [],
+    "label_abbreviations": [
+      "KRY.",
+      "KARY."
+    ],
+    "normalized_aliases": [
+      "karayel"
+    ],
+    "ocr_variants": [
+      "K4R4YEL",
+      "KARAY3L",
+      "K4R4Y3L"
+    ],
+    "markets": [
+      "BİM"
+    ],
+    "categories": [
+      "Personal Care"
+    ]
+  },
+  {
+    "canonical_name": "SHİNE",
+    "aliases": [
+      "SHINE"
+    ],
+    "label_abbreviations": [
+      "SHN.",
+      "SHI."
+    ],
+    "normalized_aliases": [
+      "shine",
+      "shi̇ne"
+    ],
+    "ocr_variants": [
+      "5H1NF",
+      "SH1NE",
+      "5HINE"
+    ],
+    "markets": [
+      "BİM"
+    ],
+    "categories": [
+      "Personal Care"
+    ]
+  },
+  {
+    "canonical_name": "IŞIL",
+    "aliases": [
+      "ISIL"
+    ],
+    "label_abbreviations": [
+      "ISL."
+    ],
+    "normalized_aliases": [
+      "isil",
+      "işil"
+    ],
+    "ocr_variants": [
+      "151L",
+      "IS1L",
+      "15IL"
+    ],
+    "markets": [
+      "BİM"
+    ],
+    "categories": [
+      "Personal Care",
+      "Household"
+    ]
+  },
+  {
+    "canonical_name": "ARTMATİK",
+    "aliases": [
+      "ARTMATIK"
+    ],
+    "label_abbreviations": [
+      "ART.",
+      "ARTM."
+    ],
+    "normalized_aliases": [
+      "artmatik",
+      "artmati̇k"
+    ],
+    "ocr_variants": [
+      "AR7MA71K",
+      "ARTMA71K",
+      "AR7MATIK"
+    ],
+    "markets": [
+      "BİM"
+    ],
+    "categories": [
+      "Cleaning"
+    ]
+  },
+  {
+    "canonical_name": "KAANLAR",
+    "aliases": [],
+    "label_abbreviations": [
+      "KAAN.",
+      "KNL."
+    ],
+    "normalized_aliases": [
+      "kaanlar"
+    ],
+    "ocr_variants": [
+      "K44NL4R",
+      "KAANL4R",
+      "K4ANLAR"
+    ],
+    "markets": [],
+    "categories": [
+      "Dairy",
+      "Pantry"
+    ]
+  },
+  {
+    "canonical_name": "XROLL",
+    "aliases": [],
+    "label_abbreviations": [
+      "XRL."
+    ],
+    "normalized_aliases": [
+      "xroll"
+    ],
+    "ocr_variants": [
+      "XR0LL",
+      "XRO11",
+      "XR011"
+    ],
+    "markets": [
+      "A101"
+    ],
+    "categories": [
+      "Snacks"
+    ]
+  },
+  {
+    "canonical_name": "NİMET",
+    "aliases": [
+      "NIMET"
+    ],
+    "label_abbreviations": [
+      "NMT.",
+      "NIM."
+    ],
+    "normalized_aliases": [
+      "nimet",
+      "ni̇met"
+    ],
+    "ocr_variants": [
+      "N1MET",
+      "NLMET",
+      "N1M37"
+    ],
+    "markets": [
+      "A101"
+    ],
+    "categories": [
+      "Pantry",
+      "Snacks",
+      "Frozen"
+    ]
+  },
+  {
+    "canonical_name": "AHİR",
+    "aliases": [
+      "AHIR"
+    ],
+    "label_abbreviations": [
+      "AHR."
+    ],
+    "normalized_aliases": [
+      "ahir",
+      "ahi̇r"
+    ],
+    "ocr_variants": [
+      "AH1R",
+      "AHLR",
+      "4H1R"
+    ],
+    "markets": [
+      "A101"
+    ],
+    "categories": [
+      "Dairy"
+    ]
+  },
+  {
+    "canonical_name": "TARABYA",
+    "aliases": [],
+    "label_abbreviations": [
+      "TRB.",
+      "TBY."
+    ],
+    "normalized_aliases": [
+      "tarabya"
+    ],
+    "ocr_variants": [
+      "7ARABYA",
+      "TAR4BY4",
+      "74R4BY4"
+    ],
+    "markets": [
+      "A101"
+    ],
+    "categories": [
+      "Dairy"
+    ]
+  },
+  {
+    "canonical_name": "ZEO",
+    "aliases": [],
+    "label_abbreviations": [
+      "ZEO."
+    ],
+    "normalized_aliases": [
+      "zeo"
+    ],
+    "ocr_variants": [
+      "ZE0",
+      "2EO",
+      "2E0",
+      "ZF0"
+    ],
+    "markets": [
+      "A101"
+    ],
+    "categories": [
+      "Pantry"
+    ]
+  },
+  {
+    "canonical_name": "ÇEREZYA",
+    "aliases": [
+      "CEREZYA"
+    ],
+    "label_abbreviations": [
+      "CRZ.",
+      "CER."
+    ],
+    "normalized_aliases": [
+      "cerezya",
+      "çerezya"
+    ],
+    "ocr_variants": [
+      "C3REZYA",
+      "CER3ZY4",
+      "C3R3ZY4"
+    ],
+    "markets": [
+      "A101"
+    ],
+    "categories": [
+      "Snacks"
+    ]
+  },
+  {
+    "canonical_name": "YÖREMCE",
+    "aliases": [
+      "YOREMCE"
+    ],
+    "label_abbreviations": [
+      "YOR.",
+      "YRM."
+    ],
+    "normalized_aliases": [
+      "yoremce",
+      "yöremce"
+    ],
+    "ocr_variants": [
+      "Y0REMCE",
+      "YOR3MC3",
+      "Y0R3MC3"
+    ],
+    "markets": [
+      "A101"
+    ],
+    "categories": [
+      "Pantry"
+    ]
+  },
+  {
+    "canonical_name": "OVADAN",
+    "aliases": [],
+    "label_abbreviations": [
+      "OVD.",
+      "OVDN."
+    ],
+    "normalized_aliases": [
+      "ovadan"
+    ],
+    "ocr_variants": [
+      "0VADAN",
+      "OV4D4N",
+      "0V4D4N"
+    ],
+    "markets": [
+      "A101"
+    ],
+    "categories": [
+      "Pantry"
+    ]
+  },
+  {
+    "canonical_name": "YEĞENLER",
+    "aliases": [
+      "YEGENLER"
+    ],
+    "label_abbreviations": [
+      "YGN.",
+      "YEGEN."
+    ],
+    "normalized_aliases": [
+      "yegenler",
+      "yeğenler"
+    ],
+    "ocr_variants": [
+      "Y3G3NL3R",
+      "YEGENL3R",
+      "Y3GENLER"
+    ],
+    "markets": [
+      "A101"
+    ],
+    "categories": [
+      "Pantry"
+    ]
+  },
+  {
+    "canonical_name": "VERA",
+    "aliases": [],
+    "label_abbreviations": [
+      "VER."
+    ],
+    "normalized_aliases": [
+      "vera"
+    ],
+    "ocr_variants": [
+      "V3RA",
+      "VER4",
+      "V3R4"
+    ],
+    "markets": [
+      "A101"
+    ],
+    "categories": [
+      "Pantry"
+    ]
+  },
+  {
+    "canonical_name": "GALLE",
+    "aliases": [],
+    "label_abbreviations": [
+      "GAL."
+    ],
+    "normalized_aliases": [
+      "galle"
+    ],
+    "ocr_variants": [
+      "G4LLE",
+      "GA11E",
+      "GALLF",
+      "G411E"
+    ],
+    "markets": [
+      "A101"
+    ],
+    "categories": [
+      "Pantry"
+    ]
+  },
+  {
+    "canonical_name": "ÇOKÇA",
+    "aliases": [
+      "COKCA"
+    ],
+    "label_abbreviations": [
+      "COK.",
+      "CKC."
+    ],
+    "normalized_aliases": [
+      "cokca",
+      "çokça"
+    ],
+    "ocr_variants": [
+      "C0KCA",
+      "COKC4",
+      "C0KC4"
+    ],
+    "markets": [
+      "A101"
+    ],
+    "categories": [
+      "Pantry"
+    ]
+  },
+  {
+    "canonical_name": "MENDİVA",
+    "aliases": [],
+    "label_abbreviations": [
+      "MND.",
+      "MNDV."
+    ],
+    "normalized_aliases": [
+      "mendi̇va"
+    ],
+    "ocr_variants": [
+      "M3ND1VA",
+      "MEND1V4",
+      "M3NDlVA"
+    ],
+    "markets": [
+      "A101"
+    ],
+    "categories": [
+      "Personal Care",
+      "Household"
+    ]
+  },
+  {
+    "canonical_name": "MİSTRAL",
+    "aliases": [],
+    "label_abbreviations": [
+      "MST.",
+      "MSTR."
+    ],
+    "normalized_aliases": [
+      "mi̇stral"
+    ],
+    "ocr_variants": [
+      "M15TRAL",
+      "MISTR4L",
+      "M157R4L"
+    ],
+    "markets": [
+      "A101"
+    ],
+    "categories": [
+      "Household"
+    ]
+  },
+  {
+    "canonical_name": "ŞÖLEN",
+    "aliases": [
+      "SOLEN"
+    ],
+    "label_abbreviations": [
+      "SLN.",
+      "SOL."
+    ],
+    "normalized_aliases": [
+      "solen",
+      "şölen"
+    ],
+    "ocr_variants": [
+      "50LEN",
+      "5OLEN",
+      "SOL3N"
+    ],
+    "markets": [],
+    "categories": [
+      "Snacks"
+    ]
+  },
+  {
+    "canonical_name": "NESTLE",
+    "aliases": [],
+    "label_abbreviations": [
+      "NST.",
+      "NES."
+    ],
+    "normalized_aliases": [
+      "nestle"
+    ],
+    "ocr_variants": [
+      "N35TLE",
+      "NES7LE",
+      "N357L3"
+    ],
+    "markets": [],
+    "categories": [
+      "Snacks",
+      "Pantry",
+      "Beverage"
+    ]
+  },
+  {
+    "canonical_name": "MİLKA",
+    "aliases": [],
+    "label_abbreviations": [
+      "MIL.",
+      "MLK."
+    ],
+    "normalized_aliases": [
+      "mi̇lka"
+    ],
+    "ocr_variants": [
+      "M1LKA",
+      "MLLKA",
+      "M1LK4"
+    ],
+    "markets": [],
+    "categories": [
+      "Snacks"
+    ]
+  },
+  {
+    "canonical_name": "ALGİDA",
+    "aliases": [],
+    "label_abbreviations": [
+      "ALG.",
+      "ALGI."
+    ],
+    "normalized_aliases": [
+      "algi̇da"
+    ],
+    "ocr_variants": [
+      "AL6IDA",
+      "ALG1D4",
+      "4LGID4"
+    ],
+    "markets": [],
+    "categories": [
+      "Frozen"
+    ]
+  },
+  {
+    "canonical_name": "GOLF",
+    "aliases": [],
+    "label_abbreviations": [
+      "GLF.",
+      "GOL."
+    ],
+    "normalized_aliases": [
+      "golf"
+    ],
+    "ocr_variants": [
+      "G0LF",
+      "C0LF",
+      "G01F"
+    ],
+    "markets": [],
+    "categories": [
+      "Frozen"
+    ]
+  },
+  {
+    "canonical_name": "DARDANEL",
+    "aliases": [],
+    "label_abbreviations": [
+      "DRD.",
+      "DARD."
+    ],
+    "normalized_aliases": [
+      "dardanel"
+    ],
+    "ocr_variants": [
+      "Pantry",
+      "Frozen",
+      "Meat & Poultry"
+    ],
+    "markets": [],
+    "categories": [
+      "Pantry",
+      "Frozen",
+      "Meat & Poultry"
+    ]
+  },
+  {
+    "canonical_name": "TUKAŞ",
+    "aliases": [
+      "TUKAS"
+    ],
+    "label_abbreviations": [
+      "TUK.",
+      "TUKS."
+    ],
+    "normalized_aliases": [
+      "tukas",
+      "tukaş"
+    ],
+    "ocr_variants": [
+      "7UKAS",
+      "TUK45",
+      "7VK45"
+    ],
+    "markets": [],
+    "categories": [
+      "Pantry"
+    ]
+  },
+  {
+    "canonical_name": "BİNGO",
+    "aliases": [],
+    "label_abbreviations": [
+      "BNG.",
+      "BING."
+    ],
+    "normalized_aliases": [
+      "bi̇ngo"
+    ],
+    "ocr_variants": [
+      "B1NGO",
+      "BIN60",
+      "B1N60"
+    ],
+    "markets": [],
+    "categories": [
+      "Cleaning"
+    ]
+  },
+  {
+    "canonical_name": "OMO",
+    "aliases": [],
+    "label_abbreviations": [
+      "OMO",
+      "OM."
+    ],
+    "normalized_aliases": [
+      "omo"
+    ],
+    "ocr_variants": [
+      "0M0",
+      "OM0",
+      "0MO"
+    ],
+    "markets": [],
+    "categories": [
+      "Cleaning"
+    ]
+  },
+  {
+    "canonical_name": "ARİEL",
+    "aliases": [
+      "ARIEL"
+    ],
+    "label_abbreviations": [
+      "ARL.",
+      "ARI."
+    ],
+    "normalized_aliases": [
+      "ariel",
+      "ari̇el"
+    ],
+    "ocr_variants": [
+      "4RIEL",
+      "AR1EL",
+      "4R13L"
+    ],
+    "markets": [],
+    "categories": [
+      "Cleaning"
+    ]
+  },
+  {
+    "canonical_name": "FAIRY",
+    "aliases": [],
+    "label_abbreviations": [
+      "FRY.",
+      "FAI."
+    ],
+    "normalized_aliases": [
+      "fairy"
+    ],
+    "ocr_variants": [
+      "F4IRY",
+      "FA1RY",
+      "F41RY"
+    ],
+    "markets": [],
+    "categories": [
+      "Cleaning"
+    ]
+  },
+  {
+    "canonical_name": "YUMOŞ",
+    "aliases": [
+      "YUMOS"
+    ],
+    "label_abbreviations": [
+      "YUM.",
+      "YMS."
+    ],
+    "normalized_aliases": [
+      "yumos",
+      "yumoş"
+    ],
+    "ocr_variants": [
+      "YUM05",
+      "YVMOS",
+      "YVM05"
+    ],
+    "markets": [],
+    "categories": [
+      "Cleaning"
+    ]
+  },
+  {
+    "canonical_name": "DOMESTOS",
+    "aliases": [],
+    "label_abbreviations": [
+      "DOM.",
+      "DOMS."
+    ],
+    "normalized_aliases": [
+      "domestos"
+    ],
+    "ocr_variants": [
+      "D0ME5705",
+      "DOMES7OS",
+      "D0ME5T05"
+    ],
+    "markets": [],
+    "categories": [
+      "Cleaning"
+    ]
+  },
+  {
+    "canonical_name": "KNORR",
+    "aliases": [],
+    "label_abbreviations": [
+      "KNR."
+    ],
+    "normalized_aliases": [
+      "knorr"
+    ],
+    "ocr_variants": [
+      "KN0RR",
+      "KMORR",
+      "KN0R"
+    ],
+    "markets": [],
+    "categories": [
+      "Pantry"
+    ]
+  },
+  {
+    "canonical_name": "LİPTON",
+    "aliases": [
+      "LIPTON"
+    ],
+    "label_abbreviations": [
+      "LIP.",
+      "LPT."
+    ],
+    "normalized_aliases": [
+      "lipton",
+      "li̇pton"
+    ],
+    "ocr_variants": [
+      "L1PTON",
+      "LIPT0N",
+      "L1P70N"
+    ],
+    "markets": [],
+    "categories": [
+      "Beverage",
+      "Pantry"
+    ]
+  },
+  {
+    "canonical_name": "ÇAYKUR",
+    "aliases": [
+      "CAYKUR"
+    ],
+    "label_abbreviations": [
+      "CYK.",
+      "CAY."
+    ],
+    "normalized_aliases": [
+      "caykur",
+      "çaykur"
+    ],
+    "ocr_variants": [
+      "CAYKVR",
+      "C4YKUR",
+      "CAYKVR"
+    ],
+    "markets": [],
+    "categories": [
+      "Beverage",
+      "Pantry"
+    ]
+  },
+  {
+    "canonical_name": "DOĞUŞ",
+    "aliases": [
+      "DOGUS"
+    ],
+    "label_abbreviations": [
+      "DGS.",
+      "DOG."
+    ],
+    "normalized_aliases": [
+      "dogus",
+      "doğuş"
+    ],
+    "ocr_variants": [
+      "D0GUS",
+      "DOGV5",
+      "D0GV5"
+    ],
+    "markets": [],
+    "categories": [
+      "Beverage",
+      "Pantry"
+    ]
+  },
+  {
+    "canonical_name": "COCA-COLA",
+    "aliases": [
+      "COCA COLA",
+      "COCACOLA"
+    ],
+    "label_abbreviations": [
+      "CC.",
+      "C.COLA",
+      "COLA."
+    ],
+    "normalized_aliases": [
+      "coca cola",
+      "coca-cola",
+      "cocacola"
+    ],
+    "ocr_variants": [
+      "C0CA-C0LA",
+      "COCA-C0LA",
+      "C0CA COLA"
+    ],
+    "markets": [],
+    "categories": [
+      "Beverage"
+    ]
+  },
+  {
+    "canonical_name": "PEPSİ",
+    "aliases": [
+      "PEPSI"
+    ],
+    "label_abbreviations": [
+      "PEP."
+    ],
+    "normalized_aliases": [
+      "pepsi",
+      "pepsi̇"
+    ],
+    "ocr_variants": [
+      "P3PS1",
+      "PEPS1",
+      "P3PSl"
+    ],
+    "markets": [],
+    "categories": [
+      "Beverage"
+    ]
+  },
+  {
+    "canonical_name": "FANTA",
+    "aliases": [],
+    "label_abbreviations": [
+      "FNT.",
+      "FAN."
+    ],
+    "normalized_aliases": [
+      "fanta"
+    ],
+    "ocr_variants": [
+      "F4NTA",
+      "FANT4",
+      "F4N74"
+    ],
+    "markets": [],
+    "categories": [
+      "Beverage"
+    ]
+  },
+  {
+    "canonical_name": "SPRİTE",
+    "aliases": [
+      "SPRITE"
+    ],
+    "label_abbreviations": [
+      "SPR.",
+      "SPRT."
+    ],
+    "normalized_aliases": [
+      "sprite",
+      "spri̇te"
+    ],
+    "ocr_variants": [
+      "5PRITE",
+      "SPR1TE",
+      "5PR17E"
+    ],
+    "markets": [],
+    "categories": [
+      "Beverage"
+    ]
+  },
+  {
+    "canonical_name": "YEDİGÜN",
+    "aliases": [
+      "YEDIGUN"
+    ],
+    "label_abbreviations": [
+      "YED.",
+      "YDG."
+    ],
+    "normalized_aliases": [
+      "yedigun",
+      "yedi̇gun",
+      "yedi̇gün"
+    ],
+    "ocr_variants": [
+      "Y3DIGVN",
+      "YED1GVN",
+      "Y3D1GVN"
+    ],
+    "markets": [],
+    "categories": [
+      "Beverage"
+    ]
+  },
+  {
+    "canonical_name": "DİDİ",
+    "aliases": [
+      "DIDI"
+    ],
+    "label_abbreviations": [
+      "DID."
+    ],
+    "normalized_aliases": [
+      "didi",
+      "di̇di̇"
+    ],
+    "ocr_variants": [
+      "D1D1",
+      "DID1",
+      "D1Dl"
+    ],
+    "markets": [],
+    "categories": [
+      "Beverage"
+    ]
+  },
+  {
+    "canonical_name": "ULUDAĞ",
+    "aliases": [
+      "ULUDAG"
+    ],
+    "label_abbreviations": [
+      "ULD.",
+      "ULUD."
+    ],
+    "normalized_aliases": [
+      "uludag",
+      "uludağ"
+    ],
+    "ocr_variants": [
+      "VLVDAG",
+      "ULUD4G",
+      "VLVD46"
+    ],
+    "markets": [],
+    "categories": [
+      "Beverage"
+    ]
+  },
+  {
+    "canonical_name": "BEYPAZARI",
+    "aliases": [],
+    "label_abbreviations": [
+      "BEY.",
+      "BYP."
+    ],
+    "normalized_aliases": [
+      "beypazari"
+    ],
+    "ocr_variants": [
+      "B3YPAZARI",
+      "BEYP4Z4RI",
+      "B3YP4Z4R1"
+    ],
+    "markets": [],
+    "categories": [
+      "Beverage"
+    ]
+  },
+  {
+    "canonical_name": "KIZILAY",
+    "aliases": [],
+    "label_abbreviations": [
+      "KIZ.",
+      "KZL."
+    ],
+    "normalized_aliases": [
+      "kizilay"
+    ],
+    "ocr_variants": [
+      "K1Z1LAY",
+      "KIZ1L4Y",
+      "KlZlL4Y"
+    ],
+    "markets": [],
+    "categories": [
+      "Beverage"
+    ]
+  },
+  {
+    "canonical_name": "ERİKLİ",
+    "aliases": [
+      "ERIKLI"
+    ],
+    "label_abbreviations": [
+      "ERK.",
+      "ERIK."
+    ],
+    "normalized_aliases": [
+      "erikli",
+      "eri̇kli̇"
+    ],
+    "ocr_variants": [
+      "ER1KL1",
+      "ERLKLl",
+      "3R1KL1"
+    ],
+    "markets": [],
+    "categories": [
+      "Beverage"
+    ]
+  },
+  {
+    "canonical_name": "HAYAT",
+    "aliases": [],
+    "label_abbreviations": [
+      "HYT.",
+      "HAY."
+    ],
+    "normalized_aliases": [
+      "hayat"
+    ],
+    "ocr_variants": [
+      "H4Y4T",
+      "HAY47",
+      "H4Y47"
+    ],
+    "markets": [],
+    "categories": [
+      "Beverage"
+    ]
+  },
+  {
+    "canonical_name": "SIRMA",
+    "aliases": [],
+    "label_abbreviations": [
+      "SRM.",
+      "SIR."
+    ],
+    "normalized_aliases": [
+      "sirma"
+    ],
+    "ocr_variants": [
+      "51RMA",
+      "S1RM4",
+      "5lRM4"
+    ],
+    "markets": [],
+    "categories": [
+      "Beverage"
+    ]
+  },
+  {
+    "canonical_name": "NUTELLA",
+    "aliases": [],
+    "label_abbreviations": [
+      "NUT.",
+      "NTL."
+    ],
+    "normalized_aliases": [
+      "nutella"
+    ],
+    "ocr_variants": [
+      "NVTELLA",
+      "NUT3LLA",
+      "NV73LL4"
+    ],
+    "markets": [],
+    "categories": [
+      "Pantry",
+      "Snacks"
+    ]
+  },
+  {
+    "canonical_name": "BANVİT",
+    "aliases": [],
+    "label_abbreviations": [
+      "BAN.",
+      "BNV."
+    ],
+    "normalized_aliases": [
+      "banvi̇t"
+    ],
+    "ocr_variants": [
+      "B4NV1T",
+      "BANV17",
+      "B4NVl7"
+    ],
+    "markets": [],
+    "categories": [
+      "Meat & Poultry",
+      "Frozen"
+    ]
+  },
+  {
+    "canonical_name": "ŞENPİLİÇ",
+    "aliases": [
+      "SENPILIC",
+      "SEN PILIC"
+    ],
+    "label_abbreviations": [
+      "SEN.",
+      "SNP."
+    ],
+    "normalized_aliases": [
+      "sen pilic",
+      "sen-pilic",
+      "senpilic",
+      "senpi̇li̇c",
+      "şenpi̇li̇ç"
+    ],
+    "ocr_variants": [
+      "5ENPILIC",
+      "SENP1L1C",
+      "53NP1L1C"
+    ],
+    "markets": [],
+    "categories": [
+      "Meat & Poultry",
+      "Frozen"
+    ]
+  },
+  {
+    "canonical_name": "ERPİLİÇ",
+    "aliases": [
+      "ERPILIC",
+      "ER PILIC"
+    ],
+    "label_abbreviations": [
+      "ERP."
+    ],
+    "normalized_aliases": [
+      "er pilic",
+      "er-pilic",
+      "erpilic",
+      "erpi̇li̇c",
+      "erpi̇li̇ç"
+    ],
+    "ocr_variants": [
+      "3RPILIC",
+      "ERP1L1C",
+      "3RP1L1C"
+    ],
+    "markets": [],
+    "categories": [
+      "Meat & Poultry",
+      "Frozen"
+    ]
+  },
+  {
+    "canonical_name": "MARET",
+    "aliases": [],
+    "label_abbreviations": [
+      "MRT."
+    ],
+    "normalized_aliases": [
+      "maret"
+    ],
+    "ocr_variants": [
+      "M4RET",
+      "MAR37",
+      "M4R37"
+    ],
+    "markets": [],
+    "categories": [
+      "Meat & Poultry",
+      "Pantry"
+    ]
+  },
+  {
+    "canonical_name": "NAMET",
+    "aliases": [],
+    "label_abbreviations": [
+      "NMT."
+    ],
+    "normalized_aliases": [
+      "namet"
+    ],
+    "ocr_variants": [
+      "N4MET",
+      "NAM37",
+      "N4M37"
+    ],
+    "markets": [],
+    "categories": [
+      "Meat & Poultry",
+      "Pantry"
+    ]
+  },
+  {
+    "canonical_name": "İÇİM",
+    "aliases": [
+      "ICIM"
+    ],
+    "label_abbreviations": [
+      "ICM."
+    ],
+    "normalized_aliases": [
+      "icim",
+      "i̇ci̇m",
+      "i̇çi̇m"
+    ],
+    "ocr_variants": [
+      "1C1M",
+      "IC1M",
+      "LCLM",
+      "!C!M"
+    ],
+    "markets": [],
+    "categories": [
+      "Dairy"
+    ]
+  },
+  {
+    "canonical_name": "SEK",
+    "aliases": [],
+    "label_abbreviations": [
+      "SEK."
+    ],
+    "normalized_aliases": [
+      "sek"
+    ],
+    "ocr_variants": [
+      "5EK",
+      "SEK",
+      "53K"
+    ],
+    "markets": [],
+    "categories": [
+      "Dairy",
+      "Beverage"
+    ]
+  },
+  {
+    "canonical_name": "DANONE",
+    "aliases": [],
+    "label_abbreviations": [
+      "DAN.",
+      "DNN."
+    ],
+    "normalized_aliases": [
+      "danone"
+    ],
+    "ocr_variants": [
+      "D4N0NE",
+      "DAN0N3",
+      "D4N0N3"
+    ],
+    "markets": [],
+    "categories": [
+      "Dairy",
+      "Beverage"
+    ]
+  },
+  {
+    "canonical_name": "ACTIVIA",
+    "aliases": [],
+    "label_abbreviations": [
+      "ACT.",
+      "ACTV."
+    ],
+    "normalized_aliases": [
+      "activia"
+    ],
+    "ocr_variants": [
+      "AC71V1A",
+      "ACTIV14",
+      "4C71V14"
+    ],
+    "markets": [],
+    "categories": [
+      "Dairy"
+    ]
+  },
+  {
+    "canonical_name": "SİGNAL",
+    "aliases": [
+      "SIGNAL"
+    ],
+    "label_abbreviations": [
+      "SIG.",
+      "SGN."
+    ],
+    "normalized_aliases": [
+      "signal",
+      "si̇gnal"
+    ],
+    "ocr_variants": [
+      "51GNAL",
+      "SIGN4L",
+      "516N4L"
+    ],
+    "markets": [],
+    "categories": [
+      "Personal Care"
+    ]
+  },
+  {
+    "canonical_name": "İPANA",
+    "aliases": [],
+    "label_abbreviations": [
+      "IPA.",
+      "IPN."
+    ],
+    "normalized_aliases": [
+      "i̇pana"
+    ],
+    "ocr_variants": [
+      "1PANA",
+      "LPANA",
+      "!PANA",
+      "IP4NA",
+      "1P4N4"
+    ],
+    "markets": [],
+    "categories": [
+      "Personal Care"
+    ]
+  },
+  {
+    "canonical_name": "COLGATE",
+    "aliases": [],
+    "label_abbreviations": [
+      "COL.",
+      "CLG."
+    ],
+    "normalized_aliases": [
+      "colgate"
+    ],
+    "ocr_variants": [
+      "C0L6A7E",
+      "COLG4TE",
+      "C0LG473"
+    ],
+    "markets": [],
+    "categories": [
+      "Personal Care"
+    ]
+  },
+  {
+    "canonical_name": "ELİDOR",
+    "aliases": [],
+    "label_abbreviations": [
+      "ELD.",
+      "ELI."
+    ],
+    "normalized_aliases": [
+      "eli̇dor"
+    ],
+    "ocr_variants": [
+      "EL1D0R",
+      "ELlDOR",
+      "3L1D0R"
+    ],
+    "markets": [],
+    "categories": [
+      "Personal Care"
+    ]
+  },
+  {
+    "canonical_name": "PANTENE",
+    "aliases": [],
+    "label_abbreviations": [
+      "PNT.",
+      "PAN."
+    ],
+    "normalized_aliases": [
+      "pantene"
+    ],
+    "ocr_variants": [
+      "P4NTENE",
+      "PAN7ENE",
+      "P4N73N3"
+    ],
+    "markets": [],
+    "categories": [
+      "Personal Care"
+    ]
+  },
+  {
+    "canonical_name": "HEAD & SHOULDERS",
+    "aliases": [
+      "HEAD AND SHOULDERS",
+      "HEAD&SHOULDERS"
+    ],
+    "label_abbreviations": [
+      "H&S.",
+      "HEAD.",
+      "H.SHOULDERS."
+    ],
+    "normalized_aliases": [
+      "head  shoulders",
+      "head & shoulders",
+      "head and shoulders",
+      "head ve shoulders",
+      "head&shoulders",
+      "head-&-shoulders",
+      "head--shoulders",
+      "head-and-shoulders",
+      "head-ve-shoulders",
+      "headandshoulders",
+      "headshoulders",
+      "headveshoulders"
+    ],
+    "ocr_variants": [
+      "HEAD & 5HOVLDERS",
+      "HEAD & 5HOULDERS"
+    ],
+    "markets": [],
+    "categories": [
+      "Personal Care"
+    ]
+  },
+  {
+    "canonical_name": "GİLLETTE",
+    "aliases": [
+      "GILLETTE"
+    ],
+    "label_abbreviations": [
+      "GIL.",
+      "GILL."
+    ],
+    "normalized_aliases": [
+      "gillette",
+      "gi̇llette"
+    ],
+    "ocr_variants": [
+      "G1LLE77E",
+      "GILL3773",
+      "61LL3773"
+    ],
+    "markets": [],
+    "categories": [
+      "Personal Care"
+    ]
+  },
+  {
+    "canonical_name": "ORKİD",
+    "aliases": [
+      "ORKID"
+    ],
+    "label_abbreviations": [
+      "ORK.",
+      "OKD."
+    ],
+    "normalized_aliases": [
+      "orkid",
+      "orki̇d"
+    ],
+    "ocr_variants": [
+      "0RK1D",
+      "ORK1D",
+      "0RKlD"
+    ],
+    "markets": [],
+    "categories": [
+      "Personal Care"
+    ]
+  },
+  {
+    "canonical_name": "KOTEX",
+    "aliases": [],
+    "label_abbreviations": [
+      "KTX.",
+      "KOT."
+    ],
+    "normalized_aliases": [
+      "kotex"
+    ],
+    "ocr_variants": [
+      "K07EX",
+      "KOT3X",
+      "K073X"
+    ],
+    "markets": [],
+    "categories": [
+      "Personal Care"
+    ]
+  },
+  {
+    "canonical_name": "FAMİLİA",
+    "aliases": [
+      "FAMILIA"
+    ],
+    "label_abbreviations": [
+      "FAM."
+    ],
+    "normalized_aliases": [
+      "familia",
+      "fami̇li̇a"
+    ],
+    "ocr_variants": [
+      "F4MILIA",
+      "FAM1L1A",
+      "FAMLLLA",
+      "F4M1L14"
+    ],
+    "markets": [],
+    "categories": [
+      "Household"
+    ]
+  },
+  {
+    "canonical_name": "PAPİA",
+    "aliases": [],
+    "label_abbreviations": [
+      "PAP."
+    ],
+    "normalized_aliases": [
+      "papi̇a"
+    ],
+    "ocr_variants": [
+      "P4PIA",
+      "PAP1A",
+      "PAPLA",
+      "P4P14"
+    ],
+    "markets": [],
+    "categories": [
+      "Household"
+    ]
+  },
+  {
+    "canonical_name": "SOLO",
+    "aliases": [],
+    "label_abbreviations": [
+      "SOL."
+    ],
+    "normalized_aliases": [
+      "solo"
+    ],
+    "ocr_variants": [
+      "50L0",
+      "5OLO",
+      "S0L0"
+    ],
+    "markets": [],
+    "categories": [
+      "Household"
+    ]
+  },
+  {
+    "canonical_name": "COCA-COLA",
+    "aliases": [
+      "COCA COLA",
+      "COCACOLA"
+    ],
+    "label_abbreviations": [
+      "COCA",
+      "COLA"
+    ],
+    "normalized_aliases": [
+      "coca cola",
+      "coca-cola",
+      "cocacola"
+    ],
+    "ocr_variants": [
+      "COCA-C0LA",
+      "C0CA-C0LA",
+      "C0CA C0LA",
+      "COCA CO1A",
+      "COCA COLA"
+    ],
+    "markets": [],
+    "categories": [
+      "Beverage"
+    ]
+  },
+  {
+    "canonical_name": "KIZILAY",
+    "aliases": [
+      "KIZILAY MADEN SUYU"
+    ],
+    "label_abbreviations": [
+      "KIZ."
+    ],
+    "normalized_aliases": [
+      "kızılay",
+      "kizilay"
+    ],
+    "ocr_variants": [
+      "K1Z1LAY",
+      "KZLAY",
+      "KIZILAY"
+    ],
+    "markets": [],
+    "categories": [
+      "Beverage"
+    ]
+  },
+  {
+    "canonical_name": "SLEEPY",
+    "aliases": [],
+    "label_abbreviations": [
+      "SLP."
+    ],
+    "normalized_aliases": [
+      "sleepy"
+    ],
+    "ocr_variants": [
+      "SLEPY",
+      "SLEYPY"
+    ],
+    "markets": [],
+    "categories": [
+      "Baby Care",
+      "Personal Care"
+    ]
+  },
+  {
+    "canonical_name": "TAMEK",
+    "aliases": [],
+    "label_abbreviations": [
+      "TAM."
+    ],
+    "normalized_aliases": [
+      "tamek"
+    ],
+    "ocr_variants": [
+      "TAM3K",
+      "TAMEK"
+    ],
+    "markets": [],
+    "categories": [
+      "Pantry",
+      "Beverage"
+    ]
+  },
+  {
+    "canonical_name": "KEKSPİR",
+    "aliases": [
+      "KEKSPIR"
+    ],
+    "label_abbreviations": [
+      "KEK."
+    ],
+    "normalized_aliases": [
+      "kekspir",
+      "kekspi̇r",
+      "kekşpir"
+    ],
+    "ocr_variants": [
+      "KEKSP1R",
+      "KEKSPiR"
+    ],
+    "markets": [
+      "A101"
+    ],
+    "categories": [
+      "Snacks"
+    ]
+  },
+  {
+    "canonical_name": "BRITA",
+    "aliases": [],
+    "label_abbreviations": [
+      "BRT."
+    ],
+    "normalized_aliases": [
+      "brita"
+    ],
+    "ocr_variants": [
+      "ZRITA",
+      "RITA",
+      "BRITA"
+    ],
+    "markets": [],
+    "categories": [
+      "Household"
+    ]
+  },
+  {
+    "canonical_name": "MİGROS",
+    "aliases": [
+      "MIGROS"
+    ],
+    "label_abbreviations": [
+      "MIGR."
+    ],
+    "normalized_aliases": [
+      "migros",
+      "mi̇gros"
+    ],
+    "ocr_variants": [
+      "M1GROS",
+      "MLGROS",
+      "M!GROS"
+    ],
+    "markets": [
+      "Migros"
+    ],
+    "categories": [
+      "Pantry",
+      "Dairy"
+    ]
+  },
+  {
+    "canonical_name": "ÇEREZYA",
+    "aliases": [
+      "CEREZYA"
+    ],
+    "label_abbreviations": [
+      "CRZ."
+    ],
+    "normalized_aliases": [
+      "cerezya",
+      "çerezya"
+    ],
+    "ocr_variants": [
+      "CEREZYA",
+      "ÇEREZY4"
+    ],
+    "markets": [
+      "A101"
+    ],
+    "categories": [
+      "Snacks"
+    ]
+  },
+  {
+    "canonical_name": "SELPAK",
+    "aliases": [],
+    "label_abbreviations": [
+      "SLP.",
+      "SELP."
+    ],
+    "normalized_aliases": [
+      "selpak"
+    ],
+    "ocr_variants": [
+      "5ELPAK",
+      "SELP4K",
+      "53LP4K"
+    ],
+    "markets": [],
+    "categories": [
+      "Household"
+    ]
+  }
+]

@@ -113,7 +113,7 @@ struct ScannerView: View {
                         // Capture button to take a photo and start OCR analysis
                         // Fotoğraf çekmek ve OCR analizini başlatmak için yakalama butonu
                         Button(action: {
-                            viewModel.captureAndProcess(context: context)
+                            viewModel.captureAndProcess(activeSession: activeSession, context: context)
                         }) {
                             Circle()
                                 .fill(Color.white)
@@ -156,11 +156,11 @@ struct ScannerView: View {
                     .padding(.bottom, 50)
                 }
                 
-                // Layer 4: AI Analysis Loading Screen
-                // Katman 4: Yapay Zeka Analizi Yükleme Ekranı
+                // Layer 4: Short capture feedback
+                // Katman 4: Kısa çekim geri bildirimi
                 if viewModel.isProcessing {
                     ZStack {
-                        Color.black.opacity(0.8) 
+                        Color.black.opacity(0.35)
                             .ignoresSafeArea()
                         
                         VStack(spacing: 20) {
@@ -168,7 +168,7 @@ struct ScannerView: View {
                                 .scaleEffect(1.5)
                                 .tint(.white)
                             
-                            Text("Yapay zeka fiyat etiketini analiz ediyor...")
+                            Text("Etiket sepete ekleniyor...")
                                 .font(.headline)
                                 .foregroundColor(.white)
                         }
@@ -194,6 +194,7 @@ struct ScannerView: View {
             }
             .onAppear {
                 viewModel.cameraService.start()
+                viewModel.restorePendingItems(activeSession: activeSession, context: context)
             }
             .onDisappear {
                 viewModel.cameraService.stop()

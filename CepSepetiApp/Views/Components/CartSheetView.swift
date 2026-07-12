@@ -13,22 +13,37 @@ import SwiftData
 struct CartSheetView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
-    
+
     /// The shopping session being managed in the cart.
     /// Sepette yönetilen alışveriş oturumu.
     @Bindable var activeSession: ShoppingSession
-    
+
     /// Dynamically calculates the total price of all items currently in the cart.
     /// Sepetteki tüm öğelerin toplam fiyatını dinamik olarak hesaplar.
     var totalAmount: Decimal {
         guard let items = activeSession.items else { return Decimal(0) }
         var total: Decimal = 0
         for item in items {
+            guard item.processingStatus == .completed else { continue }
             total += item.price * Decimal(item.quantity)
         }
         return total
     }
-    
+
+    private var hasBlockingItems: Bool {
+        guard let items = activeSession.items else { return false }
+        return items.contains { item in
+            item.processingStatus == .queued ||
+            item.processingStatus == .processing ||
+            item.processingStatus == .needsReview ||
+            item.processingStatus == .failed
+        }
+    }
+
+    private var completedItemCount: Int {
+        activeSession.items?.filter { $0.processingStatus == .completed }.count ?? 0
+    }
+
     var body: some View {
         NavigationStack {
             VStack {
@@ -37,21 +52,42 @@ struct CartSheetView: View {
                         ForEach(items) { item in
                             @Bindable var item = item
                             HStack {
-                                VStack(alignment: .leading) {
-                                    Text(item.productName)
-                                        .font(.headline)
-                                    Text(item.price, format: .currency(code: "TRY"))
-                                        .font(.subheadline)
-                                        .foregroundColor(.gray)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    if item.processingStatus == .completed {
+                                        Text(item.productName)
+                                            .font(.headline)
+                                        if let brand = item.brand, !brand.isEmpty {
+                                            Text(brand)
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
+                                        }
+                                        Text(item.price, format: .currency(code: "TRY"))
+                                            .font(.subheadline)
+                                            .foregroundColor(.gray)
+                                    } else {
+                                        HStack(spacing: 8) {
+                                            if item.processingStatus == .queued || item.processingStatus == .processing {
+                                                ProgressView()
+                                                    .controlSize(.small)
+                                            }
+                                            Text(statusTitle(for: item))
+                                                .font(.headline)
+                                        }
+                                        Text(statusSubtitle(for: item))
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                    }
                                 }
                                 Spacer()
-                                
-                                // Stepper to adjust item quantity
-                                // Öğe miktarını ayarlamak için Stepper
-                                Stepper("", value: $item.quantity, in: 1...100)
-                                    .labelsHidden()
-                                Text("\(item.quantity) Adet")
-                                    .frame(width: 60, alignment: .trailing)
+
+                                if item.processingStatus == .completed {
+                                    // Stepper to adjust item quantity
+                                    // Öğe miktarını ayarlamak için Stepper
+                                    Stepper("", value: $item.quantity, in: 1...100)
+                                        .labelsHidden()
+                                    Text("\(item.quantity) Adet")
+                                        .frame(width: 60, alignment: .trailing)
+                                }
                             }
                         }
                         .onDelete(perform: deleteItems)
@@ -60,7 +96,7 @@ struct CartSheetView: View {
                             .foregroundColor(.gray)
                     }
                 }
-                
+
                 // Summary section with total amount and checkout button
                 // Toplam tutar ve ödeme butonu ile özet bölümü
                 VStack(spacing: 16) {
@@ -73,14 +109,22 @@ struct CartSheetView: View {
                             .bold()
                     }
                     .padding(.horizontal)
-                    
+
+                    if hasBlockingItems {
+                        Text("Analiz bekleyen ürünler kesin toplama dahil edilmedi.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal)
+                    }
+
                     Button(action: {
                         // Mark the session as completed and save the final total
                         // Oturumu tamamlandı olarak işaretleyin ve nihai toplamı kaydedin
                         activeSession.totalAmount = totalAmount
                         activeSession.isCompleted = true
                         try? context.save()
-                        
+
                         dismiss()
                     }) {
                         Text("Alışverişi Bitir")
@@ -88,11 +132,11 @@ struct CartSheetView: View {
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(activeSession.items?.isEmpty == true ? Color.gray : Color.green)
+                            .background(completedItemCount == 0 || hasBlockingItems ? Color.gray : Color.green)
                             .cornerRadius(12)
                     }
                     .padding(.horizontal)
-                    .disabled(activeSession.items?.isEmpty == true)
+                    .disabled(completedItemCount == 0 || hasBlockingItems)
                 }
                 .padding(.bottom)
             }
@@ -105,13 +149,44 @@ struct CartSheetView: View {
             }
         }
     }
-    
+
     /// Deletes selected items from the shopping session.
     /// Seçili öğeleri alışveriş oturumundan siler.
     private func deleteItems(offsets: IndexSet) {
         guard let items = activeSession.items else { return }
         for index in offsets {
             context.delete(items[index])
+        }
+    }
+
+    private func statusTitle(for item: ShoppingItem) -> String {
+        switch item.processingStatus {
+        case .queued:
+            return "Sırada..."
+        case .processing:
+            return "Analiz ediliyor..."
+        case .needsReview:
+            return item.productName.isEmpty ? "Sonucu kontrol edin" : item.productName
+        case .failed:
+            return "Ürün analiz edilemedi"
+        case .completed:
+            return item.productName
+        }
+    }
+
+    private func statusSubtitle(for item: ShoppingItem) -> String {
+        switch item.processingStatus {
+        case .queued:
+            return "Etiket işleme kuyruğuna alındı."
+        case .processing:
+            return "OCR ve AI doğrulaması çalışıyor."
+        case .needsReview:
+            let priceText = item.price > 0 ? "Tahmini fiyat: \(item.price.formatted(.currency(code: "TRY")))" : "Manuel kontrol gerekli."
+            return priceText
+        case .failed:
+            return item.processingError ?? "Manuel giriş veya tekrar deneme gerekli."
+        case .completed:
+            return ""
         }
     }
 }
@@ -121,7 +196,7 @@ struct CartSheetView: View {
  CartSheetView provides a detailed list of items in the current activeSession.
  It allows users to modify quantities or remove items before finalizing the shopping trip.
  It interacts directly with SwiftData via the modelContext and updates the session state.
- 
+
  ÖZET:
  CartSheetView, mevcut activeSession'daki öğelerin ayrıntılı bir listesini sağlar.
  Kullanıcıların alışveriş gezisini sonlandırmadan önce miktarları değiştirmesine veya öğeleri kaldırmasına olanak tanır.

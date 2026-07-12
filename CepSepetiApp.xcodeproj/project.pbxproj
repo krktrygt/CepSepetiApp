@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		50C0DA022FE44A0100ABCDEF /* brands.json in Resources */ = {isa = PBXBuildFile; fileRef = 50C0DA012FE44A0100ABCDEF /* brands.json */; };
 		50BBEE582F962D8D006047DF /* Secrets.plist in Resources */ = {isa = PBXBuildFile; fileRef = 50BBEE572F962D8D006047DF /* Secrets.plist */; };
 /* End PBXBuildFile section */
 
@@ -24,6 +25,7 @@
 		5062DA882F523A8F00A28B29 /* CepSepetiApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CepSepetiApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		50A343262FB1F9C5007E5FCA /* CepSepetiAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CepSepetiAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		50BBEE572F962D8D006047DF /* Secrets.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Secrets.plist; sourceTree = "<group>"; };
+		50C0DA012FE44A0100ABCDEF /* brands.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = brands.json; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -61,6 +63,7 @@
 			isa = PBXGroup;
 			children = (
 				50BBEE572F962D8D006047DF /* Secrets.plist */,
+				50C0DA012FE44A0100ABCDEF /* brands.json */,
 				5062DA8A2F523A8F00A28B29 /* CepSepetiApp */,
 				50A343272FB1F9C5007E5FCA /* CepSepetiAppTests */,
 				5062DA892F523A8F00A28B29 /* Products */,
@@ -168,6 +171,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				50C0DA022FE44A0100ABCDEF /* brands.json in Resources */,
 				50BBEE582F962D8D006047DF /* Secrets.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
