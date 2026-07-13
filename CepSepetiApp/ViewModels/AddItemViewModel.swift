@@ -22,6 +22,7 @@ final class AddItemViewModel {
     /// OCR ve yapay zeka işlemesini koordine eden hat (pipeline).
     let pipeline = ImageProcessingPipeline()
     private let scanCoordinator = ScanProcessingCoordinator()
+    private var captureTask: Task<Void, Never>?
 
     // MARK: - State Properties
     // MARK: - Durum Özellikleri
@@ -53,7 +54,13 @@ final class AddItemViewModel {
         showErrorAlert = false
         ocrResult = nil
 
-        Task {
+        captureTask = Task { [weak self] in
+            guard let self else { return }
+            defer {
+                self.isProcessing = false
+                self.captureTask = nil
+            }
+
             do {
                 // Step 1: Capture a high-quality photo using the camera service.
                 // Adım 1: Kamera servisini kullanarak yüksek kaliteli bir fotoğraf yakalayın.
@@ -62,12 +69,19 @@ final class AddItemViewModel {
                 // Step 2: Persist a placeholder item and process it in the background.
                 // Adım 2: Geçici ürünü kaydet ve arka planda işle.
                 self.scanCoordinator.submitScan(image: image, session: activeSession, context: context)
+            } catch is CancellationError {
+                return
             } catch {
                 self.errorMessage = "Kamera hatası: Fotoğraf çekilemedi."
                 self.showErrorAlert = true
             }
-            self.isProcessing = false
         }
+    }
+
+    func cancelCapture() {
+        captureTask?.cancel()
+        captureTask = nil
+        isProcessing = false
     }
 
     func restorePendingItems(activeSession: ShoppingSession, context: ModelContext) {

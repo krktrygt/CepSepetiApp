@@ -11,7 +11,6 @@ import SwiftData
 /// The primary camera interface for scanning price tags. It provides overlays and triggers the OCR analysis.
 /// Fiyat etiketlerini taramak için birincil kamera arayüzü. Kaplamalar (overlays) sağlar ve OCR analizini tetikler.
 struct ScannerView: View {
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
     
     /// Manages the state and logic for capturing and processing images.
@@ -20,10 +19,13 @@ struct ScannerView: View {
     /// Controls the visibility of the shopping cart sheet.
     /// Alışveriş sepeti sayfasının görünürlüğünü kontrol eder.
     @State private var showCart: Bool = false
+    @State private var isCameraPreviewVisible = true
+    @State private var isClosingScanner = false
     
     /// The parent shopping session to which new items will be added.
     /// Yeni öğelerin ekleneceği ana alışveriş oturumu.
     let activeSession: ShoppingSession
+    let onClose: () -> Void
     
     /// Controls the device flashlight state.
     /// Cihaz feneri durumunu kontrol eder.
@@ -32,6 +34,19 @@ struct ScannerView: View {
     /// Flag to show the cancellation confirmation alert.
     /// İptal onay uyarısını göstermek için bayrak.
     @State private var showCancelAlert = false
+
+    private func closeScanner() {
+        guard !isClosingScanner else { return }
+        isClosingScanner = true
+        showCart = false
+        viewModel.showConfirmation = false
+        showCancelAlert = false
+        viewModel.cancelCapture()
+        viewModel.cameraService.stop {
+            isCameraPreviewVisible = false
+            onClose()
+        }
+    }
     
     /// Action to cancel the shopping session and cleanup items.
     /// Alışveriş oturumunu iptal etme ve öğeleri temizleme eylemi.
@@ -43,30 +58,35 @@ struct ScannerView: View {
         }
         context.delete(activeSession)
         try? context.save()
-        viewModel.cameraService.stop()
-        dismiss()
+        closeScanner()
     }
     
     var body: some View {
-        NavigationStack {
-            ZStack {
+        ZStack {
                 // Layer 1: Live Camera Feed
                 // Katman 1: Canlı Kamera Akışı
-                CameraPreview(cameraService: viewModel.cameraService)
-                    .ignoresSafeArea()
+                if isCameraPreviewVisible {
+                    CameraPreview(cameraService: viewModel.cameraService)
+                        .ignoresSafeArea()
+                        .allowsHitTesting(false)
+                } else {
+                    Color.black
+                        .ignoresSafeArea()
+                        .allowsHitTesting(false)
+                }
                 
                 // Layer 2: Visual Scanning Overlay (Target Frame)
                 // Katman 2: Görsel Tarama Kaplaması (Hedef Çerçeve)
                 ScannerOverlayView()
                     .ignoresSafeArea()
+                    .allowsHitTesting(false)
                 
                 // Layer 3: Controls and Toolbar
                 // Katman 3: Kontroller ve Araç Çubuğu
                 VStack {
                     HStack {
                         Button(action: {
-                            viewModel.cameraService.stop()
-                            dismiss()
+                            closeScanner()
                         }) {
                             Image(systemName: "chevron.left.circle.fill")
                                 .font(.system(size: 30))
@@ -174,31 +194,34 @@ struct ScannerView: View {
                         }
                     }
                 }
+        }
+        .allowsHitTesting(!isClosingScanner)
+        // Present confirmation sheet when OCR analysis is successful
+        // OCR analizi başarılı olduğunda onay sayfasını sunun
+        .sheet(isPresented: $viewModel.showConfirmation) {
+            if viewModel.ocrResult != nil {
+                AddProductView(viewModel: viewModel, activeSession: activeSession)
+                    .presentationDetents([.fraction(0.85), .medium])
             }
-            // Present confirmation sheet when OCR analysis is successful
-            // OCR analizi başarılı olduğunda onay sayfasını sunun
-            .sheet(isPresented: $viewModel.showConfirmation) {
-                if viewModel.ocrResult != nil {
-                    AddProductView(viewModel: viewModel, activeSession: activeSession)
-                        .presentationDetents([.fraction(0.85), .medium])
-                }
+        }
+        // Show alert on processing failure or fallback
+        // İşleme hatasında veya geri dönüşte (fallback) uyarı gösterin
+        .alert("Bilgi", isPresented: $viewModel.showErrorAlert) {
+            Button("Tamam", role: .cancel) { }
+        } message: {
+            if let message = viewModel.errorMessage {
+                Text(message)
             }
-            // Show alert on processing failure or fallback
-            // İşleme hatasında veya geri dönüşte (fallback) uyarı gösterin
-            .alert("Bilgi", isPresented: $viewModel.showErrorAlert) {
-                Button("Tamam", role: .cancel) { }
-            } message: {
-                if let message = viewModel.errorMessage {
-                    Text(message)
-                }
-            }
-            .onAppear {
-                viewModel.cameraService.start()
-                viewModel.restorePendingItems(activeSession: activeSession, context: context)
-            }
-            .onDisappear {
-                viewModel.cameraService.stop()
-            }
+        }
+        .onAppear {
+            isCameraPreviewVisible = true
+            isClosingScanner = false
+            viewModel.cameraService.start()
+            viewModel.restorePendingItems(activeSession: activeSession, context: context)
+        }
+        .onDisappear {
+            isCameraPreviewVisible = false
+            viewModel.cameraService.stop()
         }
         .sheet(isPresented: $showCart) {
             CartSheetView(activeSession: activeSession)
@@ -206,8 +229,7 @@ struct ScannerView: View {
         }
         .onChange(of: activeSession.isCompleted) { _, newValue in
             if newValue {
-                viewModel.cameraService.stop()
-                dismiss()
+                closeScanner()
             }
         }
         .alert("Alışverişi İptal Et", isPresented: $showCancelAlert) {
@@ -227,24 +249,36 @@ struct ScannerOverlayView: View {
     var body: some View {
         GeometryReader { geometry in
             let size = geometry.size
-            let frameSize = size.width * 0.7 
-            
+            let frameSize = min(size.width * 0.7, size.height * 0.45)
+            let verticalInset = max((size.height - frameSize) / 2, 0)
+            let horizontalInset = max((size.width - frameSize) / 2, 0)
+
             ZStack {
-                Color.black.opacity(0.5)
-                
-                // Cutout square in the middle
-                // Ortadaki oyuk kare
-                RoundedRectangle(cornerRadius: 16)
-                    .frame(width: frameSize, height: frameSize)
-                    .blendMode(.destinationOut) 
-                
-                // Border for the cutout
-                // Oyuk için kenarlık
+                VStack(spacing: 0) {
+                    Color.black.opacity(0.5)
+                        .frame(height: verticalInset)
+
+                    HStack(spacing: 0) {
+                        Color.black.opacity(0.5)
+                            .frame(width: horizontalInset)
+
+                        Color.clear
+                            .frame(width: frameSize, height: frameSize)
+
+                        Color.black.opacity(0.5)
+                            .frame(width: horizontalInset)
+                    }
+                    .frame(height: frameSize)
+
+                    Color.black.opacity(0.5)
+                        .frame(height: verticalInset)
+                }
+                .frame(width: size.width, height: size.height)
+
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(Color.white, lineWidth: 3)
                     .frame(width: frameSize, height: frameSize)
             }
-            .compositingGroup() 
         }
     }
 }

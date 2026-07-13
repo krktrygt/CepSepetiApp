@@ -17,6 +17,8 @@ final class ImageProcessingPipeline {
     private let ocrService = OCRService()
     private let geminiService = GeminiService()
     private let localParserService = LocalOCRParserService()
+    private let preflightValidator = OCRPreflightValidator()
+    private let aiResultValidator = AIResultValidator()
 
     /// Processes an image: checks connectivity, performs OCR, and analyzes results with Gemini AI.
     /// Bir görüntüyü işler: bağlantıyı kontrol eder, OCR gerçekleştirir ve sonuçları Gemini AI ile analiz eder.
@@ -43,6 +45,8 @@ final class ImageProcessingPipeline {
             }
         } catch let error as OCRError {
             return .failure(error)
+        } catch let error as ScanProcessingError {
+            return .failure(.geminiError(error.localizedDescription))
         } catch {
             return .failure(.parsingFailed)
         }
@@ -60,6 +64,12 @@ final class ImageProcessingPipeline {
             print("\n📝 --- RAW OCR TEXT ---")
             print(rawText)
             print("------------------------\n")
+
+            let preflight = preflightValidator.validate(rawText)
+            guard preflight.canUseOCR else {
+                logOCR(rawText: rawText, success: false, context: context)
+                throw ScanProcessingError.preflightFailed(preflight.message ?? "Etiket okunamadı. Lütfen tekrar çekin.")
+            }
 
             // Step 2: Use Local Parser as a fast candidate producer.
             // Adım 2: Yerel Ayrıştırıcıyı hızlı aday üretici olarak kullan.
@@ -84,7 +94,8 @@ final class ImageProcessingPipeline {
                     localResult: localResult,
                     source: .localOffline,
                     confidence: confidence,
-                    needsReview: true
+                    needsReview: true,
+                    validationWarnings: ["İnternet bağlantısı yok. Yerel tahmin kontrol edilmeli."]
                 )
             }
 
@@ -97,7 +108,26 @@ final class ImageProcessingPipeline {
                 print("   Brand: \(parsedResult.brand ?? "None")")
                 print("   Price: \(parsedResult.price)\n")
 
-                logOCR(rawText: rawText, success: true, context: context)
+                let validation = aiResultValidator.validate(parsedResult)
+                guard validation.isAcceptable else {
+                    logOCR(rawText: rawText, success: false, context: context)
+                    if localResult.price > 0 && !localResult.productName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        return ScanProcessingResult(
+                            productName: localResult.productName,
+                            brand: localResult.brand,
+                            price: localResult.price,
+                            rawOCRText: rawText,
+                            localResult: localResult,
+                            source: .localOffline,
+                            confidence: confidence,
+                            needsReview: true,
+                            validationWarnings: validation.warnings
+                        )
+                    }
+                    throw ScanProcessingError.validationFailed(validation.warnings.joined(separator: " "))
+                }
+
+                logOCR(rawText: rawText, success: !validation.needsReview, context: context)
 
                 return ScanProcessingResult(
                     productName: parsedResult.productName,
@@ -107,8 +137,33 @@ final class ImageProcessingPipeline {
                     localResult: localResult,
                     source: .ai,
                     confidence: parsedResult.confidenceScore ?? 1.0,
-                    needsReview: false
+                    needsReview: validation.needsReview,
+                    validationWarnings: validation.warnings
                 )
+            } catch let error as GeminiError {
+                print("⚠️ Gemini AI failed. Error: \(error.userMessage)")
+                if error.isRetryable {
+                    logOCR(rawText: rawText, success: false, context: context)
+                    throw ScanProcessingError.retryable(error.userMessage)
+                }
+
+                print("🚀 Falling back to Local Parser Result as a safety measure.")
+
+                logOCR(rawText: rawText, success: false, context: context)
+
+                return ScanProcessingResult(
+                    productName: localResult.productName,
+                    brand: localResult.brand,
+                    price: localResult.price,
+                    rawOCRText: rawText,
+                    localResult: localResult,
+                    source: .localOffline,
+                    confidence: confidence,
+                    needsReview: true,
+                    validationWarnings: [error.userMessage]
+                )
+            } catch let error as ScanProcessingError {
+                throw error
             } catch {
                 print("⚠️ Gemini AI failed. Error: \(error.localizedDescription)")
                 print("🚀 Falling back to Local Parser Result as a safety measure.")
@@ -123,12 +178,15 @@ final class ImageProcessingPipeline {
                     localResult: localResult,
                     source: .localOffline,
                     confidence: confidence,
-                    needsReview: true
+                    needsReview: true,
+                    validationWarnings: [error.localizedDescription]
                 )
             }
 
         } catch let error as OCRError {
             logOCR(rawText: rawText, success: false, context: context)
+            throw error
+        } catch let error as ScanProcessingError {
             throw error
         } catch {
             logOCR(rawText: rawText, success: false, context: context)

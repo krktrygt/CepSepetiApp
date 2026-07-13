@@ -12,8 +12,44 @@ import Foundation
 enum GeminiError: Error {
     case missingAPIKey
     case networkError(String)
+    case httpStatus(Int)
+    case transport(URLError)
     case invalidResponse
     case parsingFailed
+
+    var isRetryable: Bool {
+        switch self {
+        case .transport(let error):
+            return error.code == .timedOut ||
+                error.code == .notConnectedToInternet ||
+                error.code == .networkConnectionLost ||
+                error.code == .cannotFindHost ||
+                error.code == .cannotConnectToHost
+        case .httpStatus(let status):
+            return status == 408 || status == 429 || (500...599).contains(status)
+        case .networkError:
+            return true
+        case .missingAPIKey, .invalidResponse, .parsingFailed:
+            return false
+        }
+    }
+
+    var userMessage: String {
+        switch self {
+        case .missingAPIKey:
+            return "Gemini API anahtarı bulunamadı."
+        case .networkError(let message):
+            return message
+        case .httpStatus(let status):
+            return "Sunucu yanıtı başarısız. Kod: \(status)"
+        case .transport(let error):
+            return error.localizedDescription
+        case .invalidResponse:
+            return "Gemini geçersiz yanıt döndürdü."
+        case .parsingFailed:
+            return "Gemini yanıtı okunamadı."
+        }
+    }
 }
 
 /// A service that interacts with Google's Gemini AI API to analyze and parse OCR text into structured data.
@@ -96,7 +132,15 @@ final class GeminiService {
 
         // Execute the network request.
         // Ağ isteğini gerçekleştirin.
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let data: Data
+        let response: URLResponse
+        do {
+            (data, response) = try await URLSession.shared.data(for: request)
+        } catch let error as URLError {
+            throw GeminiError.transport(error)
+        } catch {
+            throw GeminiError.networkError(error.localizedDescription)
+        }
 
         // Debugging block for HTTP response status.
         // HTTP yanıt durumu için hata ayıklama bloğu.
@@ -106,7 +150,7 @@ final class GeminiService {
             if httpResponse.statusCode != 200 {
                 let serverErrorMessage = String(data: data, encoding: .utf8) ?? "Mesaj okunamadı"
                 print("🚨 GOOGLE API ERROR DETAIL:\n\(serverErrorMessage)")
-                throw GeminiError.networkError("Sunucu Hatası. Kod: \(httpResponse.statusCode)")
+                throw GeminiError.httpStatus(httpResponse.statusCode)
             }
         } else {
             throw GeminiError.invalidResponse

@@ -14,7 +14,7 @@ struct SessionDetailView: View {
     /// The shopping session to display.
     /// Görüntülenecek alışveriş oturumu.
     let session: ShoppingSession
-    
+
     var body: some View {
         List {
             if let items = session.items, !items.isEmpty {
@@ -28,17 +28,23 @@ struct SessionDetailView: View {
                             Text(item.productName)
                                 .font(.body)
                                 .foregroundColor(.primary)
-                            
+
                             if let brand = item.brand, !brand.isEmpty {
                                 Text(brand)
                                     .font(.caption)
                                     .foregroundColor(.gray)
                             }
-                            
+
                             if item.quantity > 1 {
                                 Text("\(item.quantity) Adet (Birim: \(item.price, format: .currency(code: "TRY")))")
                                     .font(.caption2)
                                     .foregroundColor(.secondary)
+                            }
+
+                            if item.processingStatus != .completed {
+                                Text(statusText(for: item))
+                                    .font(.caption2)
+                                    .foregroundColor(.orange)
                             }
                         }
                     }
@@ -67,6 +73,21 @@ struct SessionDetailView: View {
                 .padding()
             }
             .background(.regularMaterial)
+        }
+    }
+
+    private func statusText(for item: ShoppingItem) -> String {
+        switch item.processingStatus {
+        case .queued:
+            return "Sırada"
+        case .processing:
+            return "Analiz ediliyor"
+        case .needsReview:
+            return "Kontrol bekliyor"
+        case .failed:
+            return "Eklenemedi"
+        case .completed:
+            return ""
         }
     }
 }

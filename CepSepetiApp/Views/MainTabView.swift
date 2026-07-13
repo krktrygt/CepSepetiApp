@@ -8,57 +8,62 @@ import SwiftData
 
 struct MainTabView: View {
     @State private var selectedTab: Int = 0
-    @State private var isScannerPresented: Bool = false
+    @State private var scannerSession: ShoppingSession?
     
     // We need access to the modelContext to find or create an active session
     @Environment(\.modelContext) private var modelContext
     @Query(filter: #Predicate<ShoppingSession> { $0.isCompleted == false }) private var activeSessions: [ShoppingSession]
+
+    private var tabSelection: Binding<Int> {
+        Binding(
+            get: { selectedTab },
+            set: { newValue in
+                if newValue == 1 {
+                    presentScanner()
+                } else {
+                    selectedTab = newValue
+                }
+            }
+        )
+    }
     
     var body: some View {
-        TabView(selection: $selectedTab) {
-            // 1. Left Tab: Home
-            NavigationStack {
-                HomeView()
-            }
-            .tabItem {
-                Label("Ana Sayfa", systemImage: "house.fill")
-            }
-            .tag(0)
-            
-            // 2. Center Tab: Invisible/Placeholder for triggering fullScreenCover
-            // We use a dummy view because the actual action is handled by .onChange or a custom button
-            Color.clear
-                .tabItem {
-                    Label("Başlat", systemImage: "cart.fill.badge.plus")
+        Group {
+            if let scannerSession {
+                ScannerView(activeSession: scannerSession) {
+                    self.scannerSession = nil
                 }
-                .tag(1)
-            
-            // 3. Right Tab: Statistics
-            NavigationStack {
-                StatisticsView()
-            }
-            .tabItem {
-                Label("İstatistikler", systemImage: "chart.pie.fill")
-            }
-            .tag(2)
-        }
-        .onChange(of: selectedTab) { oldValue, newValue in
-            if newValue == 1 {
-                // Reset tab to previous to prevent switching to the empty middle tab
-                selectedTab = oldValue
-                // Trigger the scanner cover
-                isScannerPresented = true
-            }
-        }
-        .fullScreenCover(isPresented: $isScannerPresented) {
-            // When the scanner is triggered, we need to pass an active session.
-            // If no active session exists, we should handle it (usually ScannerView handles creation or expects one).
-            if let session = getOrCreateActiveSession() {
-                ScannerView(activeSession: session)
             } else {
-                Text("Oturum başlatılamadı.")
+                TabView(selection: tabSelection) {
+                    NavigationStack {
+                        HomeView()
+                    }
+                    .tabItem {
+                        Label("Ana Sayfa", systemImage: "house.fill")
+                    }
+                    .tag(0)
+
+                    Color.clear
+                        .tabItem {
+                            Label("Başlat", systemImage: "cart.fill.badge.plus")
+                        }
+                        .tag(1)
+
+                    NavigationStack {
+                        StatisticsView()
+                    }
+                    .tabItem {
+                        Label("İstatistikler", systemImage: "chart.pie.fill")
+                    }
+                    .tag(2)
+                }
             }
         }
+    }
+
+    private func presentScanner() {
+        guard scannerSession == nil else { return }
+        scannerSession = getOrCreateActiveSession()
     }
     
     /// Helper to ensure we have a session to pass to the ScannerView

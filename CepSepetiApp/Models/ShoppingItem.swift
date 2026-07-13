@@ -31,7 +31,7 @@ final class ShoppingItem {
     /// The timestamp when the item was added.
     /// Öğenin eklendiği zaman damgası.
     var createdAt: Date
-    var processingStatusRaw: String
+    var processingStatusRaw: String = ItemProcessingStatus.completed.rawValue
     var scanJobID: UUID?
     var capturedImagePath: String?
     var rawOCRText: String?
@@ -40,7 +40,7 @@ final class ShoppingItem {
     var localPrice: Double?
     var aiConfidence: Double?
     var processingError: String?
-    var retryCount: Int
+    var retryCount: Int = 0
     var processingStartedAt: Date?
     var processingCompletedAt: Date?
     /// The shopping session this item belongs to.

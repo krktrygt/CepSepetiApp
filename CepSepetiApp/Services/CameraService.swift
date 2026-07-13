@@ -11,7 +11,7 @@ import UIKit
 
 /// A helper class that handles the photo capture delegate callbacks and manages Swift concurrency continuations.
 /// Fotoğraf yakalama delege geri çağırmalarını yöneten ve Swift eşzamanlılık devamlılıklarını (continuations) idare eden yardımcı sınıf.
-final class PhotoCaptureProcessor: NSObject, AVCapturePhotoCaptureDelegate {
+nonisolated final class PhotoCaptureProcessor: NSObject, AVCapturePhotoCaptureDelegate {
     private var continuation: CheckedContinuation<UIImage, Error>?
     /// Callback triggered when the process is fully complete to allow for cleanup.
     /// İşlem tamamen bittiğinde temizlik yapılmasına izin vermek için tetiklenen geri çağırma.
@@ -55,6 +55,9 @@ final class CameraService: NSObject {
     /// Output for capturing high-resolution photos.
     /// Yüksek çözünürlüklü fotoğraflar yakalamak için çıktı.
     private let photoOutput = AVCapturePhotoOutput()
+    private let sessionQueue = DispatchQueue(label: "CepSepetiApp.CameraSessionQueue", qos: .userInitiated)
+    private var isSessionRunning = false
+    private var isShuttingDown = false
     /// Reference to the video input device.
     /// Video giriş cihazına referans.
     private var videoDeviceInput: AVCaptureDeviceInput?
@@ -101,19 +104,34 @@ final class CameraService: NSObject {
         session.commitConfiguration()
     }
     
-    /// Starts the capture session on a global background queue.
-    /// Yakalama oturumunu küresel bir arka plan kuyruğunda başlatır.
+    /// Starts the capture session on a serial session queue.
+    /// Yakalama oturumunu seri session kuyruğunda başlatır.
     func start() {
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            self?.session.startRunning()
+        sessionQueue.async { [weak self] in
+            guard let self, !self.isSessionRunning else { return }
+            self.isShuttingDown = false
+            self.session.startRunning()
+            self.isSessionRunning = self.session.isRunning
         }
     }
     
-    /// Stops the capture session on a global background queue.
-    /// Yakalama oturumunu küresel bir arka plan kuyruğunda durdurur.
-    func stop() {
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            self?.session.stopRunning()
+    /// Stops the capture session on a serial session queue.
+    /// Yakalama oturumunu seri session kuyruğunda durdurır.
+    func stop(completion: (() -> Void)? = nil) {
+        sessionQueue.async { [weak self] in
+            if let self {
+                self.isShuttingDown = true
+                self.disableTorchIfNeeded()
+
+                if self.isSessionRunning {
+                    self.session.stopRunning()
+                    self.isSessionRunning = self.session.isRunning
+                }
+            }
+
+            if let completion {
+                DispatchQueue.main.async(execute: completion)
+            }
         }
     }
     
@@ -121,13 +139,31 @@ final class CameraService: NSObject {
     /// Kameranın fenerini (el feneri) açar/kapatır.
     /// - Parameter isOn: Boolean indicating whether the torch should be on or off.
     func toggleFlash(isOn: Bool) {
-        guard let device = videoDeviceInput?.device, device.hasTorch else { return }
+        sessionQueue.async { [weak self] in
+            guard let self,
+                  !self.isShuttingDown,
+                  let device = self.videoDeviceInput?.device,
+                  device.hasTorch else { return }
+            do {
+                try device.lockForConfiguration()
+                device.torchMode = isOn ? .on : .off
+                device.unlockForConfiguration()
+            } catch {
+                print("Flash control error: \(error)")
+            }
+        }
+    }
+
+    private func disableTorchIfNeeded() {
+        guard let device = videoDeviceInput?.device,
+              device.hasTorch,
+              device.torchMode != .off else { return }
         do {
             try device.lockForConfiguration()
-            device.torchMode = isOn ? .on : .off
+            device.torchMode = .off
             device.unlockForConfiguration()
         } catch {
-            print("Flash control error: \(error)")
+            print("Flash cleanup error: \(error)")
         }
     }
     
@@ -153,29 +189,32 @@ final class CameraService: NSObject {
     /// Asenkron olarak yüksek çözünürlüklü bir fotoğraf yakalar.
     /// - Returns: A captured UIImage.
     func capturePhoto() async throws -> UIImage {
-        // Step 1: Stabilize the image
-        // Adım 1: Görüntüyü sabitle
-        lockFocusAndExposure()
-        
-        // Step 2: Brief delay to allow lens mechanics to settle
-        // Adım 2: Lens mekaniğinin oturması için kısa bir gecikme sağla
+        // Briefly wait for lens mechanics, while still allowing scanner dismissal to cancel capture.
         try await Task.sleep(nanoseconds: 300_000_000)
-        
-        // Step 3: Trigger capture and await result via continuation
-        // Adım 3: Yakalamayı tetikle ve devamlılık (continuation) aracılığıyla sonucu bekle
+        try Task.checkCancellation()
+
         return try await withCheckedThrowingContinuation { continuation in
-            let processor = PhotoCaptureProcessor(continuation: continuation)
-            
-            processor.onComplete = { [weak self] in
-                self?.activeProcessor = nil
+            sessionQueue.async { [weak self] in
+                guard let self, self.isSessionRunning, !self.isShuttingDown else {
+                    continuation.resume(throwing: CancellationError())
+                    return
+                }
+
+                self.lockFocusAndExposure()
+
+                let processor = PhotoCaptureProcessor(continuation: continuation)
+                processor.onComplete = { [weak self] in
+                    self?.sessionQueue.async { [weak self] in
+                        self?.activeProcessor = nil
+                    }
+                }
+
+                self.activeProcessor = processor
+
+                let settings = AVCapturePhotoSettings()
+                settings.maxPhotoDimensions = self.photoOutput.maxPhotoDimensions
+                self.photoOutput.capturePhoto(with: settings, delegate: processor)
             }
-            
-            self.activeProcessor = processor
-            
-            let settings = AVCapturePhotoSettings()
-            settings.maxPhotoDimensions = self.photoOutput.maxPhotoDimensions
-            
-            self.photoOutput.capturePhoto(with: settings, delegate: processor)
         }
     }
 }

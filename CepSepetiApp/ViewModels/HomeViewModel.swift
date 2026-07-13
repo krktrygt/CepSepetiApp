@@ -26,7 +26,7 @@ final class HomeViewModel {
             let sessionMonth = Calendar.current.component(.month, from: session.date)
             let sessionYear = Calendar.current.component(.year, from: session.date)
             
-            return sessionMonth == currentMonth && sessionYear == currentYear
+            return session.isCompleted && sessionMonth == currentMonth && sessionYear == currentYear
         }
         
         // Accumulate the totals.
