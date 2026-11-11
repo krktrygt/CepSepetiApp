@@ -44,7 +44,11 @@ final class ScanProcessingCoordinator {
                 session: session
             )
 
-            session.items?.append(item)
+            if session.items == nil {
+                session.items = [item]
+            } else {
+                session.items?.append(item)
+            }
             context.insert(item)
             try context.save()
 
@@ -53,7 +57,7 @@ final class ScanProcessingCoordinator {
             }
         } catch {
             let item = ShoppingItem(
-                productName: "Gorsel kaydedilemedi",
+                productName: "Görsel kaydedilemedi",
                 price: 0,
                 quantity: 1,
                 processingStatus: .failed,
@@ -62,7 +66,11 @@ final class ScanProcessingCoordinator {
                 session: session
             )
 
-            session.items?.append(item)
+            if session.items == nil {
+                session.items = [item]
+            } else {
+                session.items?.append(item)
+            }
             context.insert(item)
             try? context.save()
         }

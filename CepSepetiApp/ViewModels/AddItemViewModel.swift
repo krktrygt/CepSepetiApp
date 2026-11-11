@@ -113,7 +113,11 @@ final class AddItemViewModel {
 
         // Add to the session and insert into the persistent store.
         // Oturuma ekleyin ve kalıcı depoya yerleştirin.
-        activeSession.items?.append(newItem)
+        if activeSession.items == nil {
+            activeSession.items = [newItem]
+        } else {
+            activeSession.items?.append(newItem)
+        }
         context.insert(newItem)
 
         // Reset state and hide the confirmation UI.

@@ -161,10 +161,24 @@ final class GeminiService {
         do {
             let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
             guard let candidates = json?["candidates"] as? [[String: Any]],
-                    let content = candidates.first?["content"] as? [String: Any],
-                    let parts = content["parts"] as? [[String: Any]],
-                    let text = parts.first?["text"] as? String,
-                    let finalData = text.data(using: .utf8) else {
+                  let content = candidates.first?["content"] as? [String: Any],
+                  let parts = content["parts"] as? [[String: Any]],
+                  let text = parts.first?["text"] as? String else {
+                throw GeminiError.parsingFailed
+            }
+
+            var cleanJsonString = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            if cleanJsonString.hasPrefix("```json") {
+                cleanJsonString = String(cleanJsonString.dropFirst(7))
+            } else if cleanJsonString.hasPrefix("```") {
+                cleanJsonString = String(cleanJsonString.dropFirst(3))
+            }
+            if cleanJsonString.hasSuffix("```") {
+                cleanJsonString = String(cleanJsonString.dropLast(3))
+            }
+            cleanJsonString = cleanJsonString.trimmingCharacters(in: .whitespacesAndNewlines)
+
+            guard let finalData = cleanJsonString.data(using: .utf8) else {
                 throw GeminiError.parsingFailed
             }
 

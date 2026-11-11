@@ -53,7 +53,7 @@ actor ScanProcessingQueue {
             
             Task {
                 await handler(itemID)
-                self.finish(itemID: itemID)
+                await self.finish(itemID: itemID)
             }
         }
     }
